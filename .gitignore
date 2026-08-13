@@ -1,6 +1,6 @@
 # Binaries
 bin/
-termagent
+/termagent
 *.exe
 *.dll
 *.so

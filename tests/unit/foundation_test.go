@@ -19,8 +19,8 @@ func TestConfigDefaults(t *testing.T) {
 	if cfg.DefaultProvider != "openai" {
 		t.Errorf("expected default provider openai, got %s", cfg.DefaultProvider)
 	}
-	if cfg.MaxParallelWorkers != 4 {
-		t.Errorf("expected 4 workers, got %d", cfg.MaxParallelWorkers)
+	if cfg.MaxParallelWorkers != 5 {
+		t.Errorf("expected 5 workers, got %d", cfg.MaxParallelWorkers)
 	}
 	if err := cfg.Validate(); err != nil {
 		t.Errorf("config validation failed: %v", err)
