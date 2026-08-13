@@ -1,0 +1,29 @@
+# Binaries
+bin/
+termagent
+*.exe
+*.dll
+*.so
+*.dylib
+
+# SQLite & Storage
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Environment & Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# IDE / System
+.DS_Store
+.vscode/
+.idea/
+
+# Testing
+/tmp/
+*.test
+coverage.out
