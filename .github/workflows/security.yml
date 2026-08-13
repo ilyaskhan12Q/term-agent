@@ -1,0 +1,36 @@
+name: Security
+
+on:
+  push:
+    branches: [ main, "security/*" ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly security audit
+
+permissions:
+  contents: read
+
+jobs:
+  security-audit:
+    name: Security & Vulnerability Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+          cache: true
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Security Boundary Tests
+        run: go test -race -v ./tests/security/...
+
+      - name: Go Vet Security Scan
+        run: go vet ./...
