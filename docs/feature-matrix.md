@@ -23,7 +23,7 @@ This document maintains full traceability between requirements specified in `PRD
 | **FR-04**: Transactional Mutation Engine (11-State Machine) | PHASE_0 | TASK-0.4 | `internal/mutation/transaction.go`, `internal/mutation/mutation.go` | `tests/unit/mutation_test.go` | `FOUNDATION_ONLY` |
 | **FR-05**: Bounded Concurrent Scheduler (Default 5 Workers) | PHASE_0 | TASK-0.5 | `internal/scheduler/scheduler.go`, `internal/scheduler/dependency.go` | `tests/unit/scheduler_test.go` | `VERIFIED` |
 | **FR-06**: Context Budgeting & Compaction | PHASE_0 | TASK-0.6 | `internal/context/manager.go`, `internal/context/tokenizer.go` | `tests/unit/context_test.go` | `FOUNDATION_ONLY` |
-| **FR-07**: Session Persistence & Recovery | PHASE_1 | TASK-1.1 | `internal/app/lifecycle.go`, `internal/persistence/repository/` | `tests/integration/session_test.go` | `NOT_STARTED` |
+| **FR-07**: Session Persistence & Recovery | PHASE_1 | TASK-1.1 | `internal/app/lifecycle.go`, `internal/persistence/repository/` | `tests/integration/session_test.go` | `VERIFIED` |
 | **FR-08**: Workspace Discovery & Metadata Extraction | PHASE_3 | TASK-3.1 | `internal/workspace/discovery.go` | `tests/unit/workspace_test.go` | `NOT_STARTED` |
 | **FR-09**: Read-Only Workspace Search & Inspections | PHASE_3 | TASK-3.2 | `internal/tools/search.go`, `internal/tools/read.go` | `tests/unit/tools_test.go` | `NOT_STARTED` |
 | **FR-10**: Optimistic Concurrency Control (`before_hash`) | PHASE_4 | TASK-4.1 | `internal/mutation/mutation.go`, `internal/workspace/hashing.go` | `tests/unit/hashing_test.go` | `FOUNDATION_ONLY` |
@@ -40,7 +40,7 @@ This document maintains full traceability between requirements specified in `PRD
 
 | Requirement | Phase | Task | Implementation | Tests | Status |
 |---|---|---|---|---|---|
-| **NFR-01**: Cold Startup Latency (< 150ms) | PHASE_1 | TASK-1.2 | `cmd/termagent/main.go`, `internal/app/app.go` | `tests/integration/startup_test.go` | `FOUNDATION_ONLY` |
+| **NFR-01**: Cold Startup Latency (< 150ms) | PHASE_1 | TASK-1.2 | `cmd/termagent/main.go`, `internal/app/app.go` | `tests/integration/startup_test.go` | `VERIFIED` |
 | **NFR-02**: Zero Uncontrolled Workspace Mutations | PHASE_4 | TASK-4.3 | `internal/mutation/mutation.go`, `internal/workspace/locking.go` | `tests/security/boundary_test.go` | `FOUNDATION_ONLY` |
 | **NFR-03**: Memory Bounded File Streaming | PHASE_3 | TASK-3.3 | `internal/tools/read.go`, `internal/workspace/workspace.go` | `tests/unit/read_test.go` | `NOT_STARTED` |
 | **NFR-04**: Decoupled Event-Driven UI Architecture | PHASE_0 | TASK-0.7 | `internal/events/bus.go`, `internal/events/memory_bus.go` | `tests/unit/eventbus_test.go` | `VERIFIED` |
@@ -57,7 +57,7 @@ This document maintains full traceability between requirements specified in `PRD
 | **SEC-03**: Non-Naive Shell Risk Classifier (POSIX AST) | PHASE_6 | TASK-6.1 | `internal/security/classifier.go` | `tests/security/boundary_test.go` | `FOUNDATION_ONLY` |
 | **SEC-04**: Sensitive Path Check (`.env`, `~/.ssh/`) | PHASE_6 | TASK-6.2 | `internal/security/policy.go`, `internal/security/permissions.go` | `tests/security/policy_test.go` | `NOT_STARTED` |
 | **SEC-05**: Command Timeout & Execution Limits | PHASE_5 | TASK-5.1 | `internal/tools/shell.go` | `tests/unit/shell_test.go` | `NOT_STARTED` |
-| **SEC-06**: Secret Redaction in Logs & SQLite Messages | PHASE_1 | TASK-1.3 | `internal/config/logging.go`, `internal/persistence/writer.go` | `tests/unit/logger_test.go` | `NOT_STARTED` |
+| **SEC-06**: Secret Redaction in Logs & SQLite Messages | PHASE_1 | TASK-1.3 | `internal/config/logging.go`, `internal/persistence/writer.go` | `tests/unit/logger_test.go` | `VERIFIED` |
 | **SEC-07**: Prompt Injection Defense (Data Isolation) | PHASE_7 | TASK-7.2 | `internal/agent/context.go` | `tests/security/injection_test.go` | `NOT_STARTED` |
 
 ---
@@ -68,7 +68,7 @@ This document maintains full traceability between requirements specified in `PRD
 |---|---|---|---|---|---|
 | **DB-01**: SQLite Storage with WAL Mode & Foreign Keys | PHASE_0 | TASK-0.10 | `migrations/000001_initial_schema.sql`, `internal/persistence/database.go` | `tests/integration/foundation_test.go` | `VERIFIED` |
 | **DB-02**: 11-Table Foundational Schema DDL | PHASE_0 | TASK-0.11 | `migrations/000001_initial_schema.sql` | `tests/integration/foundation_test.go` | `VERIFIED` |
-| **DB-03**: Serialized Async Writer Channel (`AsyncWriter`) | PHASE_1 | TASK-1.4 | `internal/persistence/writer.go` | `tests/integration/persistence_test.go` | `NOT_STARTED` |
+| **DB-03**: Serialized Async Writer Channel (`AsyncWriter`) | PHASE_1 | TASK-1.4 | `internal/persistence/writer.go` | `tests/integration/writer_test.go` | `VERIFIED` |
 | **DB-04**: Session State & Pending Mutation Crash Recovery | PHASE_4 | TASK-4.4 | `internal/mutation/rollback.go`, `internal/persistence/repository/` | `tests/integration/recovery_test.go` | `NOT_STARTED` |
 
 ---
@@ -78,7 +78,7 @@ This document maintains full traceability between requirements specified in `PRD
 | Requirement | Phase | Task | Implementation | Tests | Status |
 |---|---|---|---|---|---|
 | **CLI-01**: Layered Configuration Precedence (CLI > Env > File > Defaults) | PHASE_0 | TASK-0.12 | `internal/config/config.go` | `tests/unit/config_test.go` | `VERIFIED` |
-| **CLI-02**: Standard Flag Set (`--workspace`, `--model`, `--session`, `--dry-run`) | PHASE_1 | TASK-1.5 | `cmd/termagent/main.go` | `tests/unit/cli_test.go` | `NOT_STARTED` |
+| **CLI-02**: Standard Flag Set (`--workspace`, `--model`, `--session`, `--dry-run`) | PHASE_1 | TASK-1.5 | `cmd/termagent/main.go` | `tests/unit/cli_test.go` | `VERIFIED` |
 | **UI-01**: Bubble Tea Elm Architecture Separation | PHASE_2 | TASK-2.1 | `internal/tui/model.go`, `internal/tui/update.go` | `tests/unit/tui_test.go` | `NOT_STARTED` |
 | **UI-02**: Lip Gloss Styling & Theme Tokens | PHASE_0 | TASK-0.13 | `internal/tui/styles/styles.go` | `tests/unit/tui_test.go` | `FOUNDATION_ONLY` |
 | **UI-03**: Vim Keybinding Mappings | PHASE_0 | TASK-0.14 | `internal/tui/keymap/keymap.go` | `tests/unit/tui_test.go` | `FOUNDATION_ONLY` |
