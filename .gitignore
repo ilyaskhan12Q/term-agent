@@ -1,4 +1,4 @@
-# Binaries
+# Binaries & Builds
 bin/
 /termagent
 *.exe
@@ -6,24 +6,39 @@ bin/
 *.so
 *.dylib
 
-# SQLite & Storage
+# SQLite & Local Storage
 *.db
 *.db-journal
 *.db-wal
 *.db-shm
+*.sqlite
+*.sqlite3
 
 # Environment & Secrets
 .env
 .env.local
+.env.*.local
 *.pem
 *.key
 
-# IDE / System
+# IDE / System / OS
 .DS_Store
+Thumbs.db
 .vscode/
 .idea/
+*.swp
+*~
 
-# Testing
+# Testing, Coverage & Logs
 /tmp/
 *.test
 coverage.out
+*.prof
+*.pprof
+*.out
+*.log
+
+# Local Agent & Scratch
+.gemini/
+.claude/
+scratch/
