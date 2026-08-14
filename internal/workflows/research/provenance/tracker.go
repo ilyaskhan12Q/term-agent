@@ -10,12 +10,12 @@ import (
 
 // ProvenanceReport provides a summary of evidence integrity and claim coverage across a project.
 type ProvenanceReport struct {
-	TotalSources      int     `json:"total_sources"`
-	TotalEvidence     int     `json:"total_evidence"`
-	TotalClaims       int     `json:"total_claims"`
-	SupportedClaims   int     `json:"supported_claims"`
-	CoverageScore     float64 `json:"coverage_score"`     // SupportedClaims / TotalClaims
-	VerificationRate  float64 `json:"verification_rate"`  // Verified Evidence / Total Evidence
+	TotalSources     int     `json:"total_sources"`
+	TotalEvidence    int     `json:"total_evidence"`
+	TotalClaims      int     `json:"total_claims"`
+	SupportedClaims  int     `json:"supported_claims"`
+	CoverageScore    float64 `json:"coverage_score"`    // SupportedClaims / TotalClaims
+	VerificationRate float64 `json:"verification_rate"` // Verified Evidence / Total Evidence
 }
 
 // ProvenanceTracker maintains in-memory provenance tracking and validation graphs.

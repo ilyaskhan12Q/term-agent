@@ -19,11 +19,11 @@ type CitationVerifierArgs struct {
 }
 
 type CitationVerificationResult struct {
-	ClaimStatement     string                    `json:"claim_statement"`
-	EvidenceID         string                    `json:"evidence_id"`
+	ClaimStatement     string                      `json:"claim_statement"`
+	EvidenceID         string                      `json:"evidence_id"`
 	VerificationStatus domain.EvidenceVerification `json:"verification_status"`
-	MatchConfidence    float64                   `json:"match_confidence"`
-	Reasoning          string                    `json:"reasoning"`
+	MatchConfidence    float64                     `json:"match_confidence"`
+	Reasoning          string                      `json:"reasoning"`
 }
 
 type CitationVerifierTool struct{}

@@ -15,9 +15,9 @@ type mockWorkflow struct {
 	status workflow.WorkflowStatus
 }
 
-func (m *mockWorkflow) Name() string                     { return m.name }
-func (m *mockWorkflow) Type() workflow.WorkflowType       { return m.wType }
-func (m *mockWorkflow) Status() workflow.WorkflowStatus   { return m.status }
+func (m *mockWorkflow) Name() string                    { return m.name }
+func (m *mockWorkflow) Type() workflow.WorkflowType     { return m.wType }
+func (m *mockWorkflow) Status() workflow.WorkflowStatus { return m.status }
 func (m *mockWorkflow) Initialize(ctx context.Context, input string) error {
 	m.status = workflow.WorkflowStatusPlanning
 	return nil

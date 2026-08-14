@@ -9,26 +9,26 @@ import (
 type ProjectStatus string
 
 const (
-	ProjectStatusCreated     ProjectStatus = "CREATED"
-	ProjectStatusPlanning    ProjectStatus = "PLANNING"
-	ProjectStatusExecuting   ProjectStatus = "EXECUTING"
+	ProjectStatusCreated      ProjectStatus = "CREATED"
+	ProjectStatusPlanning     ProjectStatus = "PLANNING"
+	ProjectStatusExecuting    ProjectStatus = "EXECUTING"
 	ProjectStatusSynthesizing ProjectStatus = "SYNTHESIZING"
-	ProjectStatusDrafting    ProjectStatus = "DRAFTING"
-	ProjectStatusReviewing   ProjectStatus = "REVIEWING"
-	ProjectStatusCompleted   ProjectStatus = "COMPLETED"
-	ProjectStatusFailed      ProjectStatus = "FAILED"
+	ProjectStatusDrafting     ProjectStatus = "DRAFTING"
+	ProjectStatusReviewing    ProjectStatus = "REVIEWING"
+	ProjectStatusCompleted    ProjectStatus = "COMPLETED"
+	ProjectStatusFailed       ProjectStatus = "FAILED"
 )
 
 // ResearchProject represents the top-level research objective and execution lifecycle.
 type ResearchProject struct {
-	ID          string        `json:"id"`
-	SessionID   string        `json:"session_id"`
-	Title       string        `json:"title"`
-	Objective   string        `json:"objective"`
-	TemplateID  string        `json:"template_id"`
-	Status      ProjectStatus `json:"status"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
+	ID         string        `json:"id"`
+	SessionID  string        `json:"session_id"`
+	Title      string        `json:"title"`
+	Objective  string        `json:"objective"`
+	TemplateID string        `json:"template_id"`
+	Status     ProjectStatus `json:"status"`
+	CreatedAt  time.Time     `json:"created_at"`
+	UpdatedAt  time.Time     `json:"updated_at"`
 }
 
 // NewResearchProject constructs a new ResearchProject with default template and status.

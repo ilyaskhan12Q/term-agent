@@ -89,7 +89,7 @@ func TestSynthesisAgent(t *testing.T) {
 	if synthesizer.ID() != "synth-test" {
 		t.Errorf("Expected agent ID 'synth-test', got %s", synthesizer.ID())
 	}
-	
+
 	res, err := synthesizer.ExecuteStep(ctx, "Synthesize test paper")
 	if err != nil || !res.IsDone {
 		t.Errorf("ExecuteStep failed or not done: %v", err)

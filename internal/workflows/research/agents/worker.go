@@ -14,10 +14,10 @@ import (
 
 // ResearchWorkerAgent implements specialized worker tasks for the research workflow.
 type ResearchWorkerAgent struct {
-	id          string
-	agentType   string
-	registry    *tools.Registry
-	status      agent.AgentStatus
+	id        string
+	agentType string
+	registry  *tools.Registry
+	status    agent.AgentStatus
 }
 
 // NewResearchWorkerAgent constructs a ResearchWorkerAgent.
@@ -109,10 +109,10 @@ func (a *ResearchWorkerAgent) ExecuteStep(ctx context.Context, input string) (*a
 	}
 
 	return &agent.StepResult{
-		AgentID:   a.id,
-		Thought:   fmt.Sprintf("Executing %s for research query: %s", toolName, input),
-		ToolCalls: []tools.ToolCallSpec{toolCall},
-		IsDone:    true,
+		AgentID:      a.id,
+		Thought:      fmt.Sprintf("Executing %s for research query: %s", toolName, input),
+		ToolCalls:    []tools.ToolCallSpec{toolCall},
+		IsDone:       true,
 		FinalMessage: outputStr,
 		Timestamp:    time.Now(),
 	}, nil

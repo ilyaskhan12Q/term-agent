@@ -239,4 +239,3 @@ func (w *ResearchWorkflow) Execute(ctx context.Context, bus events.EventBus) (*w
 		Duration:  time.Since(start),
 	}, nil
 }
-

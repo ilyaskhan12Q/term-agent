@@ -36,7 +36,7 @@ func main() {
 		topic = strings.Join(os.Args[1:], " ")
 	}
 
-	fmt.Printf(ColorYellow+"[1/5] Initializing Research Workspace & SQLite Database..."+ColorReset+"\n")
+	fmt.Printf(ColorYellow + "[1/5] Initializing Research Workspace & SQLite Database..." + ColorReset + "\n")
 	tmpDir, err := os.MkdirTemp("", "term-agent-demo-*")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating temp dir: %v\n", err)
@@ -52,9 +52,9 @@ func main() {
 	}
 	defer db.Close()
 
-	fmt.Printf(ColorGreen+"   ✓ SQLite Database migrated with research schema (000002_research_workflow.sql)"+ColorReset+"\n\n")
+	fmt.Printf(ColorGreen + "   ✓ SQLite Database migrated with research schema (000002_research_workflow.sql)" + ColorReset + "\n\n")
 
-	fmt.Printf(ColorYellow+"[2/5] Initializing Research Workflow Handler & Sub-Agents..."+ColorReset+"\n")
+	fmt.Printf(ColorYellow + "[2/5] Initializing Research Workflow Handler & Sub-Agents..." + ColorReset + "\n")
 	ctx := context.Background()
 	bus := events.NewInMemoryEventBus()
 	defer bus.Shutdown(ctx)
@@ -67,10 +67,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf(ColorGreen+"   ✓ Registered Tools: academic_search, pdf_extractor, citation_verifier"+ColorReset+"\n")
-	fmt.Printf(ColorGreen+"   ✓ Loaded Templates: academic_research.json, technical_survey.json"+ColorReset+"\n\n")
+	fmt.Printf(ColorGreen + "   ✓ Registered Tools: academic_search, pdf_extractor, citation_verifier" + ColorReset + "\n")
+	fmt.Printf(ColorGreen + "   ✓ Loaded Templates: academic_research.json, technical_survey.json" + ColorReset + "\n\n")
 
-	fmt.Printf(ColorYellow+"[3/5] Planning Phase: ResearchPlannerAgent Task DAG Decomposition..."+ColorReset+"\n")
+	fmt.Printf(ColorYellow + "[3/5] Planning Phase: ResearchPlannerAgent Task DAG Decomposition..." + ColorReset + "\n")
 	fmt.Printf(ColorGray+"   Research Topic: %s"+ColorReset+"\n", topic)
 	time.Sleep(300 * time.Millisecond)
 
@@ -90,18 +90,18 @@ func main() {
 	}
 	fmt.Println()
 
-	fmt.Printf(ColorYellow+"[4/5] Execution & Provenance Tracking Phase..."+ColorReset+"\n")
+	fmt.Printf(ColorYellow + "[4/5] Execution & Provenance Tracking Phase..." + ColorReset + "\n")
 	res, err := wf.Execute(ctx, bus)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Workflow execution failed: %v\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf(ColorGreen+"   ✓ Literature Search complete (Source: arXiv / IEEE Xplore)"+ColorReset+"\n")
-	fmt.Printf(ColorGreen+"   ✓ Evidence Extraction complete (PDF Extractor)"+ColorReset+"\n")
-	fmt.Printf(ColorGreen+"   ✓ Citation Verifier check: Status = Verified (Confidence: 0.98)"+ColorReset+"\n\n")
+	fmt.Printf(ColorGreen + "   ✓ Literature Search complete (Source: arXiv / IEEE Xplore)" + ColorReset + "\n")
+	fmt.Printf(ColorGreen + "   ✓ Evidence Extraction complete (PDF Extractor)" + ColorReset + "\n")
+	fmt.Printf(ColorGreen + "   ✓ Citation Verifier check: Status = Verified (Confidence: 0.98)" + ColorReset + "\n\n")
 
-	fmt.Printf(ColorYellow+"[5/5] Synthesis Phase & Research Paper Generation..."+ColorReset+"\n")
+	fmt.Printf(ColorYellow + "[5/5] Synthesis Phase & Research Paper Generation..." + ColorReset + "\n")
 	dataMap := res.Data.(map[string]interface{})
 	fmt.Printf(ColorBold+"   Paper ID: %s | Template: %s | Status: %s | Duration: %v"+ColorReset+"\n\n",
 		dataMap["paper_id"], dataMap["template_id"], dataMap["paper_status"], res.Duration)

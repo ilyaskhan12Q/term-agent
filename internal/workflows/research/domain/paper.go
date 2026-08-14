@@ -9,10 +9,10 @@ import (
 type PaperStatus string
 
 const (
-	PaperStatusDraft    PaperStatus = "DRAFT"
+	PaperStatusDraft     PaperStatus = "DRAFT"
 	PaperStatusReviewing PaperStatus = "REVIEWING"
-	PaperStatusPassed   PaperStatus = "PASSED"
-	PaperStatusRejected PaperStatus = "REJECTED"
+	PaperStatusPassed    PaperStatus = "PASSED"
+	PaperStatusRejected  PaperStatus = "REJECTED"
 )
 
 // PaperSection represents an individual section of a generated research document.
