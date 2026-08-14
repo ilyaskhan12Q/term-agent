@@ -1,0 +1,55 @@
+{
+  "id": "academic_research",
+  "name": "Academic Research Paper",
+  "description": "Standard peer-reviewed academic paper template with rigorous section decomposition and citation requirements.",
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "required": true,
+      "description": "High-level summary of research problem, methodology, key findings, and contributions."
+    },
+    {
+      "id": "introduction",
+      "title": "1. Introduction",
+      "required": true,
+      "description": "Background context, motivation, research questions, and scope."
+    },
+    {
+      "id": "literature_review",
+      "title": "2. Literature Review",
+      "required": true,
+      "description": "Synthesis of existing academic literature, identifying gaps and foundational work."
+    },
+    {
+      "id": "methodology",
+      "title": "3. Research Methodology",
+      "required": true,
+      "description": "Analytical framework, data collection methods, and experimental design."
+    },
+    {
+      "id": "results",
+      "title": "4. Results & Findings",
+      "required": true,
+      "description": "Empirical results, structured evidence analysis, and quantitative/qualitative data."
+    },
+    {
+      "id": "discussion",
+      "title": "5. Discussion & Limitations",
+      "required": true,
+      "description": "Interpretation of results, implications, and explicit research limitations."
+    },
+    {
+      "id": "conclusion",
+      "title": "6. Conclusion & Future Work",
+      "required": true,
+      "description": "Summary of core contributions and directions for future research."
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "required": true,
+      "description": "Full bibliographic list of verified sources."
+    }
+  ]
+}

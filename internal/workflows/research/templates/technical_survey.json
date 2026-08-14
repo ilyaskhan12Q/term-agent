@@ -1,0 +1,43 @@
+{
+  "id": "technical_survey",
+  "name": "Technical Survey & Technology Evaluation",
+  "description": "Industry-focused technical survey template for architecture trade-offs and tech stack analysis.",
+  "sections": [
+    {
+      "id": "exec_summary",
+      "title": "Executive Summary",
+      "required": true,
+      "description": "Concise summary for technical leaders and decision-makers."
+    },
+    {
+      "id": "tech_overview",
+      "title": "1. Technology Overview",
+      "required": true,
+      "description": "Core concepts, primitives, and ecosystem landscape."
+    },
+    {
+      "id": "comparative_analysis",
+      "title": "2. Comparative Analysis",
+      "required": true,
+      "description": "Feature matrix, performance benchmarks, and architecture tradeoffs."
+    },
+    {
+      "id": "system_architecture",
+      "title": "3. System Architecture & Patterns",
+      "required": true,
+      "description": "Integration patterns, data flows, and security models."
+    },
+    {
+      "id": "implementation_challenges",
+      "title": "4. Implementation Challenges & Risks",
+      "required": true,
+      "description": "Operational pitfalls, migration overhead, and technical debt."
+    },
+    {
+      "id": "recommendations",
+      "title": "5. Strategic Recommendations",
+      "required": true,
+      "description": "Actionable guidance and rollout roadmap."
+    }
+  ]
+}
