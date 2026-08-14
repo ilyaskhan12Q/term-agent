@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/ilyaskhan/term-agent/internal/config"
 	"github.com/ilyaskhan/term-agent/internal/events"
 	"github.com/ilyaskhan/term-agent/internal/persistence"
 	"github.com/ilyaskhan/term-agent/internal/persistence/repository"
+	"github.com/ilyaskhan/term-agent/internal/tui"
 )
 
 // App encapsulates top-level application runtime components and lifecycle management.
@@ -110,7 +109,7 @@ func (a *App) setState(s State) {
 	a.state = s
 }
 
-// Run executes main app execution loop, handling SIGINT/SIGTERM OS signals.
+// Run executes main app execution loop, starting the interactive TUI.
 func (a *App) Run(ctx context.Context) error {
 	a.setState(StateRunning)
 
@@ -128,14 +127,9 @@ func (a *App) Run(ctx context.Context) error {
 		"provider", a.cfg.DefaultProvider,
 	)
 
-	// 2. Register Signal Handler for SIGINT and SIGTERM
-	sigCtx, stopSignal := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
-	defer stopSignal()
-
-	// Wait for termination signal or context cancellation
-	select {
-	case <-sigCtx.Done():
-		a.logger.Info("Received shutdown signal, terminating gracefully...")
+	// 2. Launch Interactive TUI
+	if err := tui.Run(a.Config()); err != nil {
+		a.logger.Error("TUI exited with error", "error", err)
 	}
 
 	return a.Shutdown(context.Background())
