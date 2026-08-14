@@ -1,14 +1,18 @@
-# term-agent — Local-First Terminal AI Coding Agent
+# term-agent — Multi-Agent Orchestration Engine & Research Agent Platform
 
-`term-agent` is a production-grade, local-first terminal AI coding agent built in Go. It empowers software engineers to inspect workspaces, generate execution plans, propose atomic code mutations, visually review diffs, execute policy-controlled shell tasks, and maintain full transactional control over codebase modifications.
+`term-agent` is a production-grade, local-first **generic multi-agent orchestration engine** built in Go. It provides high-performance task decomposition, DAG scheduling, parallel worker execution, model provider abstractions, context memory budgeting, persistent SQLite event tracking, and an interactive Bubble Tea terminal user interface.
 
-> **Core Architectural Principle:**
-> *The model proposes. The runtime decides. The user approves. The transaction commits.*
+On top of this core orchestration engine, `term-agent` supports specialized vertical domain workflows. Its primary flagship workflow is **Research Agent Mode** — an automated deep research system with literature discovery, evidence extraction, citation verification, and academic paper synthesis.
+
+> **Core Architectural Principle:**  
+> *The model proposes. The engine orchestrates. The user approves. The transaction commits.*
 
 ---
 
 ## 📚 Project Documentation & Governance
 
+- **[Product Direction](docs/PRODUCT_DIRECTION.md)** — **Permanent core product direction and architectural directives.**
+- **[Research Mode Audit & Blueprint](docs/RESEARCH_WORKFLOW_ARCHITECTURAL_AUDIT.md)** — Comprehensive architecture specification for Research Agent Mode.
 - **[PRD.md](PRD.md)** — Production-Grade Product Requirements Document (Source of Truth).
 - **[Requirement Traceability Matrix](docs/feature-matrix.md)** — Complete requirement mapping (FR, NFR, SEC, DB, CLI) with task and test coverage statuses.
 - **[Architecture Specification](docs/ARCHITECTURE.md)** — Subsystem layers, structural rules, and one-way dependency boundaries.
