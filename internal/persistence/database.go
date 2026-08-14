@@ -14,6 +14,9 @@ import (
 //go:embed migrations/000001_initial_schema.sql
 var initialSchemaSQL string
 
+//go:embed migrations/000002_research_workflow.sql
+var researchWorkflowSQL string
+
 // DB encapsulates the SQLite database connection pool and schema migrations.
 type DB struct {
 	*sql.DB
@@ -55,11 +58,13 @@ func Open(dbPath string) (*DB, error) {
 	return database, nil
 }
 
-// Migrate executes initial schema DDL.
+// Migrate executes schema migrations.
 func (d *DB) Migrate(ctx context.Context) error {
-	_, err := d.ExecContext(ctx, initialSchemaSQL)
-	if err != nil {
-		return fmt.Errorf("failed to execute migration script: %w", err)
+	if _, err := d.ExecContext(ctx, initialSchemaSQL); err != nil {
+		return fmt.Errorf("failed to execute initial schema migration: %w", err)
+	}
+	if _, err := d.ExecContext(ctx, researchWorkflowSQL); err != nil {
+		return fmt.Errorf("failed to execute research workflow migration: %w", err)
 	}
 	return nil
 }
