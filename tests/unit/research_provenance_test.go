@@ -18,7 +18,7 @@ func TestProvenanceTrackerFlow(t *testing.T) {
 	src.Authors = []string{"Vaswani et al."}
 	src.Year = 2017
 
-	if err := tracker.RegisterSource(*src); err != nil {
+	if _, err := tracker.RegisterSource(*src); err != nil {
 		t.Fatalf("failed to register source: %v", err)
 	}
 

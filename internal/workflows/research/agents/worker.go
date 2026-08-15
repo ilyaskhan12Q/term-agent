@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ilyaskhan/term-agent/internal/agent"
+	"github.com/ilyaskhan/term-agent/internal/security"
 	"github.com/ilyaskhan/term-agent/internal/tools"
 	rtools "github.com/ilyaskhan/term-agent/internal/tools/research"
 	"github.com/ilyaskhan/term-agent/internal/workflows/research/domain"
@@ -106,6 +107,8 @@ func (a *ResearchWorkerAgent) ExecuteStep(ctx context.Context, input string) (*a
 	}
 	if outputStr == "" {
 		outputStr = fmt.Sprintf("Tool %s executed successfully.", toolName)
+	} else {
+		outputStr = security.WrapUntrustedContent(toolName, outputStr)
 	}
 
 	return &agent.StepResult{

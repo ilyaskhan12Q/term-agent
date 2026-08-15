@@ -49,16 +49,37 @@ func TestSymlinkEscape(t *testing.T) {
 		t.Fatalf("failed to write outside file: %v", err)
 	}
 
-	// Create symlink inside workspace pointing outside
+	// 1. Direct file symlink inside workspace pointing outside
 	symlinkPath := filepath.Join(workspaceDir, "symlink_secret.txt")
 	if err := os.Symlink(outsideFile, symlinkPath); err != nil {
 		t.Fatalf("failed to create symlink: %v", err)
 	}
 
-	// Validate path must fail
 	_, err = security.ValidateWorkspacePath(workspaceDir, "symlink_secret.txt")
 	if err == nil {
 		t.Fatalf("SECURITY FAILURE: symlink pointing outside workspace (%s -> %s) was allowed!", symlinkPath, outsideFile)
+	}
+
+	// 2. Directory symlink inside workspace pointing outside directory
+	symlinkDir := filepath.Join(workspaceDir, "outside_link")
+	if err := os.Symlink(outsideDir, symlinkDir); err != nil {
+		t.Fatalf("failed to create directory symlink: %v", err)
+	}
+
+	_, err = security.ValidateWorkspacePath(workspaceDir, "outside_link/secret.txt")
+	if err == nil {
+		t.Fatalf("SECURITY FAILURE: path traversing via directory symlink pointing outside workspace was allowed!")
+	}
+
+	// 3. Relative symlink pointing outside
+	relSymlink := filepath.Join(workspaceDir, "rel_link")
+	if err := os.Symlink("../../etc/passwd", relSymlink); err != nil {
+		t.Fatalf("failed to create relative symlink: %v", err)
+	}
+
+	_, err = security.ValidateWorkspacePath(workspaceDir, "rel_link")
+	if err == nil {
+		t.Fatalf("SECURITY FAILURE: relative symlink escaping workspace root was allowed!")
 	}
 }
 
