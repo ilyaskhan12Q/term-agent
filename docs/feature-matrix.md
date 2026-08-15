@@ -54,9 +54,9 @@ This document maintains full traceability between requirements specified in `PRD
 |---|---|---|---|---|---|
 | **SEC-01**: Lexical Path Traversal Prevention | PHASE_0 | TASK-0.9 | `internal/security/path.go` | `tests/security/boundary_test.go` | `VERIFIED` |
 | **SEC-02**: Runtime Symlink Escape Resolution | PHASE_3 | TASK-3.4 | `internal/security/path.go` (`filepath.EvalSymlinks`) | `tests/security/boundary_test.go` | `FOUNDATION_ONLY` |
-| **SEC-03**: Non-Naive Shell Risk Classifier (POSIX AST) | PHASE_6 | TASK-6.1 | `internal/security/classifier.go` | `tests/security/boundary_test.go` | `FOUNDATION_ONLY` |
-| **SEC-04**: Sensitive Path Check (`.env`, `~/.ssh/`) | PHASE_6 | TASK-6.2 | `internal/security/policy.go`, `internal/security/permissions.go` | `tests/security/policy_test.go` | `NOT_STARTED` |
-| **SEC-05**: Command Timeout & Execution Limits | PHASE_5 | TASK-5.1 | `internal/tools/shell.go` | `tests/unit/shell_test.go` | `NOT_STARTED` |
+| **SEC-03**: Non-Naive Shell Risk Classifier (POSIX AST) | PHASE_5 | TASK-5.1 | `internal/security/classifier.go` | `tests/unit/classifier_test.go`, `tests/security/boundary_test.go` | `VERIFIED` |
+| **SEC-04**: Sensitive Path Check (`.env`, `~/.ssh/`) | PHASE_5 | TASK-5.1 | `internal/security/policy.go`, `internal/security/permissions.go` | `tests/security/policy_test.go` | `VERIFIED` |
+| **SEC-05**: Command Timeout & Execution Limits | PHASE_5 | TASK-5.1 | `internal/tools/shell.go` | `tests/unit/shell_test.go` | `VERIFIED` |
 | **SEC-06**: Secret Redaction in Logs & SQLite Messages | PHASE_1 | TASK-1.3 | `internal/config/logging.go`, `internal/persistence/writer.go` | `tests/unit/logger_test.go` | `VERIFIED` |
 | **SEC-07**: Prompt Injection Defense (Data Isolation) | PHASE_7 | TASK-7.2 | `internal/agent/context.go` | `tests/security/injection_test.go` | `NOT_STARTED` |
 

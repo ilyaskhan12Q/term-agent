@@ -33,8 +33,13 @@ func TestColdStartupLatency(t *testing.T) {
 	}
 	duration := time.Since(start)
 
-	if duration > 150*time.Millisecond {
-		t.Errorf("cold startup latency exceeded 150ms budget: got %v", duration)
+	maxDuration := 150 * time.Millisecond
+	if raceEnabled {
+		maxDuration = 500 * time.Millisecond
+	}
+
+	if duration > maxDuration {
+		t.Errorf("cold startup latency exceeded %v budget: got %v", maxDuration, duration)
 	}
 
 	if application.State() != app.StateInitializing {
