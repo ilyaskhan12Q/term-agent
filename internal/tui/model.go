@@ -25,18 +25,18 @@ const (
 
 // Model represents the complete Bubble Tea application state model.
 type Model struct {
-	ActiveView   ViewMode
-	StatusMsg    string
-	IsBusy       bool
-	Width        int
-	Height       int
-	Config       *config.Config
-	Styles       *styles.Styles
-	KeyMap       keymap.KeyMap
-	Header       *components.Header
-	StatusBar    *components.StatusBar
-	Prompt       *components.Prompt
-	Spinner      *components.Spinner
+	ActiveView       ViewMode
+	StatusMsg        string
+	IsBusy           bool
+	Width            int
+	Height           int
+	Config           *config.Config
+	Styles           *styles.Styles
+	KeyMap           keymap.KeyMap
+	Header           *components.Header
+	StatusBar        *components.StatusBar
+	Prompt           *components.Prompt
+	Spinner          *components.Spinner
 	AgentView        *views.AgentView
 	ConversationView *views.ConversationView
 	PlanView         *views.PlanView

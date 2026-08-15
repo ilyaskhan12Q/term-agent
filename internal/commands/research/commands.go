@@ -71,7 +71,7 @@ func NewResearchState() *ResearchState {
 		SubAgents: map[string]string{
 			"LiteratureReviewer": "idle",
 			"MethodologyAnalyst": "idle",
-			"EvidenceVerifier":  "idle",
+			"EvidenceVerifier":   "idle",
 			"PaperSynthesizer":   "idle",
 			"ReviewerAgent":      "idle",
 		},
@@ -144,7 +144,7 @@ func (c *researchCmd) Execute(args []string) commands.CommandResult {
 	c.state.SubAgents = map[string]string{
 		"LiteratureReviewer": "running",
 		"MethodologyAnalyst": "running",
-		"EvidenceVerifier":  "waiting",
+		"EvidenceVerifier":   "waiting",
 		"PaperSynthesizer":   "waiting",
 		"ReviewerAgent":      "waiting",
 	}
@@ -312,10 +312,12 @@ func (c *sourcesCmd) Execute(args []string) commands.CommandResult {
 
 type agentsCmd struct{ state *ResearchState }
 
-func (c *agentsCmd) Name() string        { return "agents" }
-func (c *agentsCmd) Aliases() []string   { return nil }
-func (c *agentsCmd) Description() string { return "Display research sub-agent workers and execution status." }
-func (c *agentsCmd) Usage() string       { return "/agents" }
+func (c *agentsCmd) Name() string      { return "agents" }
+func (c *agentsCmd) Aliases() []string { return nil }
+func (c *agentsCmd) Description() string {
+	return "Display research sub-agent workers and execution status."
+}
+func (c *agentsCmd) Usage() string { return "/agents" }
 
 func (c *agentsCmd) Execute(args []string) commands.CommandResult {
 	var b strings.Builder
@@ -332,10 +334,12 @@ func (c *agentsCmd) Execute(args []string) commands.CommandResult {
 
 type evidenceCmd struct{ state *ResearchState }
 
-func (c *evidenceCmd) Name() string        { return "evidence" }
-func (c *evidenceCmd) Aliases() []string   { return nil }
-func (c *evidenceCmd) Description() string { return "Show extracted evidence snippets and verification status." }
-func (c *evidenceCmd) Usage() string       { return "/evidence" }
+func (c *evidenceCmd) Name() string      { return "evidence" }
+func (c *evidenceCmd) Aliases() []string { return nil }
+func (c *evidenceCmd) Description() string {
+	return "Show extracted evidence snippets and verification status."
+}
+func (c *evidenceCmd) Usage() string { return "/evidence" }
 
 func (c *evidenceCmd) Execute(args []string) commands.CommandResult {
 	if c.state.Topic == "" {
@@ -388,10 +392,12 @@ func (c *verifyCmd) Execute(args []string) commands.CommandResult {
 
 type synthesizeCmd struct{ state *ResearchState }
 
-func (c *synthesizeCmd) Name() string        { return "synthesize" }
-func (c *synthesizeCmd) Aliases() []string   { return nil }
-func (c *synthesizeCmd) Description() string { return "Synthesize research findings into paper sections." }
-func (c *synthesizeCmd) Usage() string       { return "/synthesize" }
+func (c *synthesizeCmd) Name() string      { return "synthesize" }
+func (c *synthesizeCmd) Aliases() []string { return nil }
+func (c *synthesizeCmd) Description() string {
+	return "Synthesize research findings into paper sections."
+}
+func (c *synthesizeCmd) Usage() string { return "/synthesize" }
 
 func (c *synthesizeCmd) Execute(args []string) commands.CommandResult {
 	if c.state.Topic == "" {
@@ -632,10 +638,12 @@ func (c *exportCmd) Execute(args []string) commands.CommandResult {
 
 type modelCmd struct{ state *ResearchState }
 
-func (c *modelCmd) Name() string        { return "model" }
-func (c *modelCmd) Aliases() []string   { return []string{"m"} }
-func (c *modelCmd) Description() string { return "View or switch active provider/model and credentials." }
-func (c *modelCmd) Usage() string       { return "/model [provider model | key <provider> <key>]" }
+func (c *modelCmd) Name() string      { return "model" }
+func (c *modelCmd) Aliases() []string { return []string{"m"} }
+func (c *modelCmd) Description() string {
+	return "View or switch active provider/model and credentials."
+}
+func (c *modelCmd) Usage() string { return "/model [provider model | key <provider> <key>]" }
 
 func (c *modelCmd) Execute(args []string) commands.CommandResult {
 	if len(args) == 0 {

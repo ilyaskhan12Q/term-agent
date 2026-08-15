@@ -82,8 +82,8 @@ func TestResearchMode_EndToEndFullPipeline(t *testing.T) {
 	// 2. Verify Multi-Format Export End-to-End
 	writer := templates.NewPaperWriter()
 	formats := []struct {
-		fmt  templates.ExportFormat
-		ext  string
+		fmt        templates.ExportFormat
+		ext        string
 		containStr string
 	}{
 		{templates.ExportFormatMarkdown, ".md", "# "},

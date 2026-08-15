@@ -208,10 +208,10 @@ func (cv *ConversationView) renderResearchTree(topic string, tasks map[string]st
 
 	if len(tasks) == 0 {
 		tasks = map[string]string{
-			"Literature Review":      "complete",
-			"Methodology Analysis":   "running",
-			"Evidence Verification":  "waiting",
-			"Document Synthesis":     "waiting",
+			"Literature Review":     "complete",
+			"Methodology Analysis":  "running",
+			"Evidence Verification": "waiting",
+			"Document Synthesis":    "waiting",
 		}
 	}
 

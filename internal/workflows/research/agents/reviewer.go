@@ -51,7 +51,7 @@ func (a *ReviewerAgent) AuditPaper(ctx context.Context, paper *domain.ResearchPa
 	defer func() { a.status = agent.AgentStatusCompleted }()
 
 	reviewID := fmt.Sprintf("rev-%s", paper.ID)
-	
+
 	var uncitedClaims []string
 	var contradictedClaims []string
 	var reviewComments []string

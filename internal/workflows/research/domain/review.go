@@ -11,7 +11,7 @@ type ReviewVerdict string
 const (
 	ReviewVerdictApproved      ReviewVerdict = "APPROVED"
 	ReviewVerdictNeedsRevision ReviewVerdict = "NEEDS_REVISION"
-	ReviewVerdictRejected       ReviewVerdict = "REJECTED"
+	ReviewVerdictRejected      ReviewVerdict = "REJECTED"
 )
 
 // PaperReview encapsulates the results of an adversarial claim & hallucination audit.
@@ -19,8 +19,8 @@ type PaperReview struct {
 	ID                 string        `json:"id"`
 	PaperID            string        `json:"paper_id"`
 	ProjectID          string        `json:"project_id"`
-	FidelityScore      float64       `json:"fidelity_score"`       // 0.0 - 1.0 (Higher is better)
-	HallucinationRisk  float64       `json:"hallucination_risk"`   // 0.0 - 1.0 (Lower is better)
+	FidelityScore      float64       `json:"fidelity_score"`     // 0.0 - 1.0 (Higher is better)
+	HallucinationRisk  float64       `json:"hallucination_risk"` // 0.0 - 1.0 (Lower is better)
 	Verdict            ReviewVerdict `json:"verdict"`
 	UncitedClaims      []string      `json:"uncited_claims,omitempty"`
 	ContradictedClaims []string      `json:"contradicted_claims,omitempty"`
