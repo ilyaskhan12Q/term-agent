@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `internal/model/bootstrap` package that wires concrete provider implementations into the factory at startup.
 - `NewProviderWithURL` test constructors on all three providers enabling httptest-based unit testing without real API keys.
 - 13 unit tests covering config validation, factory registration, and HTTP round-trip behavior for all three providers.
+- Phase 2 (Research Slash Commands): Extensible slash-command registry (`internal/commands`) with `Command` interface, `Registry.Dispatch`, `Registry.HelpText`, and `Registry.Lookup`.
+- Input parser (`commands.Parse`) detecting `/cmd args` prefixes from raw prompt input.
+- 12 research slash commands: `/research`, `/topic`, `/plan`, `/sources`, `/status`, `/pause`, `/resume`, `/cancel`, `/export`, `/model`, `/help`, `/clear` with aliases (`/r`, `/s`, `/m`, `/h`, `/?`, `/cls`).
+- `ResearchState` shared mutable struct propagated across all commands; provider/model switchable at runtime.
+- TUI `update.go` wired to parse all prompt input: slash commands dispatched to registry; plain text routed to orchestrator.
+- `ResearchView.AddLog` / `ResearchView.Clear` methods enabling command output rendering in the research panel.
+- `CommandResultMsg` Bubble Tea message enabling async command result delivery to the TUI event loop.
+- 22 unit tests covering parser, registry, all commands, aliases, and error paths.
 
 ## [0.8.0] - 2026-08-15
 
