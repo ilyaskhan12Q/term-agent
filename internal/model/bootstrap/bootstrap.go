@@ -26,6 +26,13 @@ func Init() {
 			return anthropic.NewProvider(cfg.APIKey)
 		case "gemini":
 			return gemini.NewProvider(cfg.APIKey)
+		case "openrouter":
+			prov, err := openai.NewProviderWithURL(cfg.APIKey, "https://openrouter.ai/api/v1/chat/completions")
+			if err != nil {
+				return nil, err
+			}
+			prov.SetName("openrouter")
+			return prov, nil
 		default:
 			return nil, fmt.Errorf("bootstrap: no factory registered for provider %q", cfg.ProviderName)
 		}

@@ -23,8 +23,8 @@ type KeyMap struct {
 func DefaultKeyMap() KeyMap {
 	return KeyMap{
 		Quit: key.NewBinding(
-			key.WithKeys("ctrl+c", "q"),
-			key.WithHelp("q / ctrl+c", "quit"),
+			key.WithKeys("ctrl+c"),
+			key.WithHelp("ctrl+c", "quit"),
 		),
 		TabNext: key.NewBinding(
 			key.WithKeys("tab"),
@@ -35,36 +35,36 @@ func DefaultKeyMap() KeyMap {
 			key.WithHelp("shift+tab", "prev view"),
 		),
 		SelectTab1: key.NewBinding(
-			key.WithKeys("1"),
-			key.WithHelp("1", "agent view"),
+			key.WithKeys("alt+1"),
+			key.WithHelp("alt+1", "agent view"),
 		),
 		SelectTab2: key.NewBinding(
-			key.WithKeys("2"),
-			key.WithHelp("2", "plan view"),
+			key.WithKeys("alt+2"),
+			key.WithHelp("alt+2", "plan view"),
 		),
 		SelectTab3: key.NewBinding(
-			key.WithKeys("3"),
-			key.WithHelp("3", "diff view"),
+			key.WithKeys("alt+3"),
+			key.WithHelp("alt+3", "diff view"),
 		),
 		SelectTab4: key.NewBinding(
-			key.WithKeys("4"),
-			key.WithHelp("4", "log view"),
+			key.WithKeys("alt+4"),
+			key.WithHelp("alt+4", "log view"),
 		),
 		SelectTab5: key.NewBinding(
-			key.WithKeys("5"),
-			key.WithHelp("5", "research view"),
+			key.WithKeys("alt+5"),
+			key.WithHelp("alt+5", "research view"),
 		),
 		Submit: key.NewBinding(
 			key.WithKeys("enter"),
 			key.WithHelp("enter", "submit prompt"),
 		),
 		ApproveDiff: key.NewBinding(
-			key.WithKeys("y"),
-			key.WithHelp("y", "approve diff"),
+			key.WithKeys("ctrl+y", "alt+y"),
+			key.WithHelp("ctrl+y", "approve diff"),
 		),
 		RejectDiff: key.NewBinding(
-			key.WithKeys("n", "esc"),
-			key.WithHelp("n/esc", "reject diff"),
+			key.WithKeys("ctrl+n", "alt+n", "esc"),
+			key.WithHelp("esc/ctrl+n", "reject diff"),
 		),
 		CancelAgent: key.NewBinding(
 			key.WithKeys("ctrl+k"),

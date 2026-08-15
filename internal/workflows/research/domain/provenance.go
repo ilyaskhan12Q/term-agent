@@ -37,6 +37,7 @@ const (
 	EvidenceStatusVerified   EvidenceVerification = "VERIFIED"
 	EvidenceStatusUnverified EvidenceVerification = "UNVERIFIED"
 	EvidenceStatusMismatch   EvidenceVerification = "MISMATCH"
+	EvidenceStatusContradicted EvidenceVerification = "CONTRADICTED"
 )
 
 // Evidence represents a verified excerpt, data point, or quote extracted from a Source.

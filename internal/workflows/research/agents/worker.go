@@ -51,10 +51,19 @@ func (a *ResearchWorkerAgent) Cancel() error {
 	return nil
 }
 
-// ExecuteStep runs specialized tool executions based on worker agentType.
+// ExecuteStep runs specialized tool executions based on worker agentType with default project ID.
 func (a *ResearchWorkerAgent) ExecuteStep(ctx context.Context, input string) (*agent.StepResult, error) {
+	return a.ExecuteStepWithProject(ctx, "proj-default", input)
+}
+
+// ExecuteStepWithProject runs specialized tool executions using the provided project ID context.
+func (a *ResearchWorkerAgent) ExecuteStepWithProject(ctx context.Context, projectID, input string) (*agent.StepResult, error) {
 	a.status = agent.AgentStatusExecuting
 	defer func() { a.status = agent.AgentStatusCompleted }()
+
+	if projectID == "" {
+		projectID = "proj-default"
+	}
 
 	var toolName string
 	var args json.RawMessage
@@ -64,22 +73,39 @@ func (a *ResearchWorkerAgent) ExecuteStep(ctx context.Context, input string) (*a
 		toolName = "academic_search"
 		args, _ = json.Marshal(rtools.AcademicSearchArgs{
 			Query:      input,
-			ProjectID:  "proj-current",
+			ProjectID:  projectID,
 			MaxResults: 3,
 		})
+	case "WEB_RESEARCH_AGENT":
+		if len(input) > 0 && (input[:4] == "http" || input[:5] == "https") {
+			toolName = "web_fetch"
+			args, _ = json.Marshal(rtools.WebFetchArgs{
+				URI:       input,
+				ProjectID: projectID,
+			})
+		} else {
+			toolName = "academic_search"
+			args, _ = json.Marshal(rtools.AcademicSearchArgs{
+				Query:      input,
+				ProjectID:  projectID,
+				MaxResults: 3,
+			})
+		}
 	case "EXTRACTION_AGENT":
 		toolName = "pdf_extractor"
+		sourceID := fmt.Sprintf("src-%s-1", projectID)
 		args, _ = json.Marshal(rtools.PDFExtractorArgs{
-			ProjectID: "proj-current",
-			SourceID:  "src-proj-current-1",
-			URI:       "https://arxiv.org/pdf/2401.00001.pdf",
+			ProjectID: projectID,
+			SourceID:  sourceID,
+			URI:       input,
 		})
 	case "VERIFICATION_AGENT":
 		toolName = "citation_verifier"
+		evidenceID := fmt.Sprintf("ev-%s-1", projectID)
 		args, _ = json.Marshal(rtools.CitationVerifierArgs{
 			ClaimStatement: input,
-			EvidenceID:     "ev-src-proj-current-1-1",
-			Snippet:        "Empirical evaluations show significant gains on benchmarks.",
+			EvidenceID:     evidenceID,
+			Snippet:        input,
 		})
 	default:
 		return &agent.StepResult{
@@ -134,9 +160,20 @@ func (a *ResearchWorkerAgent) GenerateFinding(projectID, questionID, taskID stri
 		AgentType:   a.agentType,
 		Scope:       "Scope for " + a.agentType,
 		Findings:    []string{stepRes.FinalMessage},
-		Limitations: []string{"Search scope limited to indexed academic repositories"},
+		Limitations: []string{"Search scope limited to indexed repositories"},
 		Confidence:  0.90,
 		CreatedAt:   time.Now(),
+	}
+
+	// Try extracting domain objects if tool call output contained serialized sources
+	if len(stepRes.ToolCalls) > 0 {
+		toolName := stepRes.ToolCalls[0].Name
+		if toolName == "academic_search" {
+			var sources []domain.Source
+			if err := json.Unmarshal([]byte(stepRes.FinalMessage), &sources); err == nil {
+				finding.Sources = sources
+			}
+		}
 	}
 
 	if err := finding.Validate(); err != nil {

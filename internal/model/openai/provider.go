@@ -19,11 +19,12 @@ const (
 	providerName   = "openai"
 )
 
-// Provider implements model.ModelProvider for OpenAI.
+// Provider implements model.ModelProvider for OpenAI (and OpenAI-compatible endpoints).
 type Provider struct {
-	apiKey  string
-	baseURL string
-	client  *http.Client
+	apiKey       string
+	baseURL      string
+	client       *http.Client
+	nameOverride string
 }
 
 // NewProvider constructs a Provider. apiKey must be non-empty.
@@ -38,7 +39,7 @@ func NewProvider(apiKey string) (*Provider, error) {
 	}, nil
 }
 
-// NewProviderWithURL constructs a Provider with a custom base URL, intended for unit testing.
+// NewProviderWithURL constructs a Provider with a custom base URL, intended for unit testing or custom endpoints.
 func NewProviderWithURL(apiKey, baseURL string) (*Provider, error) {
 	if apiKey == "" {
 		return nil, fmt.Errorf("openai: OPENAI_API_KEY is required")
@@ -50,7 +51,17 @@ func NewProviderWithURL(apiKey, baseURL string) (*Provider, error) {
 	}, nil
 }
 
-func (p *Provider) Name() string { return providerName }
+// SetName overrides the default provider name (e.g. for openrouter).
+func (p *Provider) SetName(name string) {
+	p.nameOverride = name
+}
+
+func (p *Provider) Name() string {
+	if p.nameOverride != "" {
+		return p.nameOverride
+	}
+	return providerName
+}
 
 func (p *Provider) Capabilities() model.ModelCapabilities {
 	return model.ModelCapabilities{

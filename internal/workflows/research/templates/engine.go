@@ -16,6 +16,12 @@ var academicResearchJSON []byte
 //go:embed technical_survey.json
 var technicalSurveyJSON []byte
 
+//go:embed executive_briefing.json
+var executiveBriefingJSON []byte
+
+//go:embed system_architecture.json
+var systemArchitectureJSON []byte
+
 // SectionSpec describes a required paper section defined in a template.
 type SectionSpec struct {
 	ID          string `json:"id"`
@@ -49,6 +55,12 @@ func NewTemplateEngine() (*TemplateEngine, error) {
 	}
 	if err := eng.LoadTemplateBytes(technicalSurveyJSON); err != nil {
 		return nil, fmt.Errorf("failed to load embedded technical_survey template: %w", err)
+	}
+	if err := eng.LoadTemplateBytes(executiveBriefingJSON); err != nil {
+		return nil, fmt.Errorf("failed to load embedded executive_briefing template: %w", err)
+	}
+	if err := eng.LoadTemplateBytes(systemArchitectureJSON); err != nil {
+		return nil, fmt.Errorf("failed to load embedded system_architecture template: %w", err)
 	}
 
 	return eng, nil
@@ -125,4 +137,16 @@ func (e *TemplateEngine) ValidatePaperCompleteness(paper *domain.ResearchPaper) 
 		}
 	}
 	return nil
+}
+
+// ListTemplates returns a list of all registered research paper templates.
+func (e *TemplateEngine) ListTemplates() []Template {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	result := make([]Template, 0, len(e.templates))
+	for _, t := range e.templates {
+		result = append(result, t)
+	}
+	return result
 }

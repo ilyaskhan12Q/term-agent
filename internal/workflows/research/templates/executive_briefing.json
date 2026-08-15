@@ -1,0 +1,37 @@
+{
+  "id": "executive_briefing",
+  "name": "Executive Briefing & Strategic Decision Memo",
+  "description": "High-level memo tailored for executives, summarizing business impact, risk factors, and strategic recommendations.",
+  "sections": [
+    {
+      "id": "exec_summary",
+      "title": "Executive Summary",
+      "required": true,
+      "description": "Concise overview of the strategic objective, context, and core takeaways."
+    },
+    {
+      "id": "key_findings",
+      "title": "1. Key Research Findings",
+      "required": true,
+      "description": "Top empirical and market findings relevant to strategic decision-making."
+    },
+    {
+      "id": "business_impact",
+      "title": "2. Business & Strategic Impact",
+      "required": true,
+      "description": "Analysis of operational impact, cost implications, and strategic advantage."
+    },
+    {
+      "id": "risk_analysis",
+      "title": "3. Risk Assessment & Mitigation",
+      "required": true,
+      "description": "Identification of critical risks, failure modes, and recommended mitigations."
+    },
+    {
+      "id": "action_items",
+      "title": "4. Actionable Recommendations & Roadmap",
+      "required": true,
+      "description": "Prioritized next steps, timeline, and decision gates."
+    }
+  ]
+}
