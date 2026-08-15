@@ -8,8 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Phase 9 parallel specialist researcher orchestration architecture.
-- Parallel worker pool scheduling and concurrency error group management.
+- Phase 1 (Research Provider/Model Setup): Real OpenAI, Anthropic, and Gemini provider implementations with `net/http` clients.
+- `model.ProviderConfig` validation that produces actionable user-facing errors for missing provider, model, or API key.
+- `model.SupportedProviders` registry listing canonical provider identifiers.
+- `model.DefaultFactory` injectable factory pattern to decouple provider construction from the model package.
+- `internal/model/bootstrap` package that wires concrete provider implementations into the factory at startup.
+- `NewProviderWithURL` test constructors on all three providers enabling httptest-based unit testing without real API keys.
+- 13 unit tests covering config validation, factory registration, and HTTP round-trip behavior for all three providers.
 
 ## [0.8.0] - 2026-08-15
 
