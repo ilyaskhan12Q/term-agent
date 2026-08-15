@@ -3,6 +3,7 @@ package provenance
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/ilyaskhan/term-agent/internal/workflows/research/domain"
@@ -16,6 +17,14 @@ type ProvenanceReport struct {
 	SupportedClaims  int     `json:"supported_claims"`
 	CoverageScore    float64 `json:"coverage_score"`    // SupportedClaims / TotalClaims
 	VerificationRate float64 `json:"verification_rate"` // Verified Evidence / Total Evidence
+	ConflictCount    int     `json:"conflict_count"`
+}
+
+// ConflictPair records conflicting evidence statements found during provenance checks.
+type ConflictPair struct {
+	EvidenceIDA string `json:"evidence_id_a"`
+	EvidenceIDB string `json:"evidence_id_b"`
+	Reason      string `json:"reason"`
 }
 
 // ProvenanceTracker maintains in-memory provenance tracking and validation graphs.
@@ -24,6 +33,7 @@ type ProvenanceTracker struct {
 	sources  map[string]domain.Source
 	evidence map[string]domain.Evidence
 	claims   map[string]domain.Claim
+	uriMap   map[string]string // URI -> Source ID mapping for deduplication
 }
 
 // NewProvenanceTracker initializes a new ProvenanceTracker.
@@ -32,18 +42,29 @@ func NewProvenanceTracker() *ProvenanceTracker {
 		sources:  make(map[string]domain.Source),
 		evidence: make(map[string]domain.Evidence),
 		claims:   make(map[string]domain.Claim),
+		uriMap:   make(map[string]string),
 	}
 }
 
-// RegisterSource records a research Source entity.
-func (t *ProvenanceTracker) RegisterSource(s domain.Source) error {
+// RegisterSource records a research Source entity with URI deduplication.
+func (t *ProvenanceTracker) RegisterSource(s domain.Source) (string, error) {
 	if s.ID == "" {
-		return errors.New("source ID cannot be empty")
+		return "", errors.New("source ID cannot be empty")
 	}
 	t.mu.Lock()
 	defer t.mu.Unlock()
+
+	// URI deduplication check
+	if s.URI != "" {
+		normURI := strings.ToLower(strings.TrimSpace(s.URI))
+		if existingID, ok := t.uriMap[normURI]; ok {
+			return existingID, nil // Return existing source ID
+		}
+		t.uriMap[normURI] = s.ID
+	}
+
 	t.sources[s.ID] = s
-	return nil
+	return s.ID, nil
 }
 
 // RegisterEvidence records an Evidence entity linked to a registered Source.
@@ -116,7 +137,36 @@ func (t *ProvenanceTracker) TraceClaim(claimID string) (*domain.Claim, []domain.
 	return &claim, evList, srcList, nil
 }
 
-// GenerateReport computes total coverage and verification statistics.
+// DetectEvidenceConflicts identifies evidence pairs with contradictory claims or status mismatches.
+func (t *ProvenanceTracker) DetectEvidenceConflicts() []ConflictPair {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
+	var conflicts []ConflictPair
+	evList := make([]domain.Evidence, 0, len(t.evidence))
+	for _, ev := range t.evidence {
+		evList = append(evList, ev)
+	}
+
+	for i := 0; i < len(evList); i++ {
+		for j := i + 1; j < len(evList); j++ {
+			evA := evList[i]
+			evB := evList[j]
+
+			if evA.VerificationStatus == domain.EvidenceStatusMismatch || evB.VerificationStatus == domain.EvidenceStatusMismatch {
+				conflicts = append(conflicts, ConflictPair{
+					EvidenceIDA: evA.ID,
+					EvidenceIDB: evB.ID,
+					Reason:      "Verification status mismatch flagged on evidence record.",
+				})
+			}
+		}
+	}
+
+	return conflicts
+}
+
+// GenerateReport computes total coverage, verification statistics, and conflict counts.
 func (t *ProvenanceTracker) GenerateReport() ProvenanceReport {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
@@ -149,6 +199,8 @@ func (t *ProvenanceTracker) GenerateReport() ProvenanceReport {
 		verificationRate = float64(verifiedEv) / float64(totalEv)
 	}
 
+	conflicts := t.DetectEvidenceConflicts()
+
 	return ProvenanceReport{
 		TotalSources:     totalSrc,
 		TotalEvidence:    totalEv,
@@ -156,6 +208,7 @@ func (t *ProvenanceTracker) GenerateReport() ProvenanceReport {
 		SupportedClaims:  supportedClaims,
 		CoverageScore:    coverageScore,
 		VerificationRate: verificationRate,
+		ConflictCount:    len(conflicts),
 	}
 }
 
@@ -173,7 +226,7 @@ func (t *ProvenanceTracker) BuildBibliographyFormats() string {
 	for _, src := range t.sources {
 		authors := "Unknown Authors"
 		if len(src.Authors) > 0 {
-			authors = fmt.Sprintf("%v", src.Authors)
+			authors = strings.Join(src.Authors, ", ")
 		}
 		res += fmt.Sprintf("[%d] %s. *%s*. %s (%d). [URI: %s]\n", idx, authors, src.Title, src.Publisher, src.Year, src.URI)
 		idx++

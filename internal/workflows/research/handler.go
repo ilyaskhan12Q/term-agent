@@ -63,6 +63,7 @@ func (w *ResearchWorkflow) Initialize(ctx context.Context, input string) error {
 
 	// Register research tools
 	w.toolRegistry.Register(rtools.NewAcademicSearchTool())
+	w.toolRegistry.Register(rtools.NewWebFetchTool())
 	w.toolRegistry.Register(rtools.NewPDFExtractorTool())
 	w.toolRegistry.Register(rtools.NewCitationVerifierTool())
 
@@ -185,7 +186,7 @@ func (w *ResearchWorkflow) Execute(ctx context.Context, bus events.EventBus) (*w
 	if src != nil {
 		src.Authors = []string{"A. Researcher", "B. Scientist"}
 		src.Year = 2024
-		_ = w.tracker.RegisterSource(*src)
+		_, _ = w.tracker.RegisterSource(*src)
 
 		ev, _ := domain.NewEvidence("ev-1", projectID, src.ID, "Empirical benchmarks indicate significant accuracy gains.", "Page 4", "worker-2")
 		if ev != nil {
