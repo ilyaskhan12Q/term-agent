@@ -64,7 +64,7 @@ func SanitizeUntrustedInput(input string) string {
 // and encapsulates it within an immutable <untrusted_content> envelope with a SHA-256 hash.
 func WrapUntrustedContent(source string, content string) string {
 	sanitized := SanitizeUntrustedInput(content)
-	
+
 	hasher := sha256.New()
 	hasher.Write([]byte(sanitized))
 	hashStr := hex.EncodeToString(hasher.Sum(nil))[:16]
