@@ -123,6 +123,14 @@ func ReadWorkspaceFile(ctx context.Context, workspaceRoot, relPath string, opts 
 		return nil, fmt.Errorf("error reading file: %w", err)
 	}
 
+	// Preserve original trailing newline if reading to EOF and file ended with '\n'
+	if !isTruncated && (endLine == 0 || endLine >= currentLine) && info.Size() > 0 {
+		lastByte := make([]byte, 1)
+		if _, err := f.ReadAt(lastByte, info.Size()-1); err == nil && lastByte[0] == '\n' {
+			sb.WriteString("\n")
+		}
+	}
+
 	actualEndLine := currentLine
 	if endLine > 0 && currentLine > endLine {
 		actualEndLine = endLine
