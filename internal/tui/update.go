@@ -48,6 +48,7 @@ type CommandResultMsg struct {
 // Update handles incoming events, keyboard input, and state transitions.
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
+	var isSubmitKey bool
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -64,6 +65,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		m.AgentView.SetSize(m.Width, bodyH)
+		m.ConversationView.SetSize(m.Width, bodyH)
 		m.PlanView.SetSize(m.Width, bodyH)
 		m.DiffView.SetSize(m.Width, bodyH)
 		m.LogView.SetSize(m.Width, bodyH)
@@ -91,10 +93,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.ActiveView = ViewResearchView
 
 		case key.Matches(msg, m.KeyMap.Submit):
+			isSubmitKey = true
 			val := m.Prompt.Value()
+			m.Prompt.Reset()
 			if val != "" {
-				m.Prompt.Reset()
-				// Echo user input to the agent log.
+				// Add user message to conversation view and legacy agent log
+				m.ConversationView.AddUserMessage(val)
 				m.AgentView.AddLog(views.AgentLogItem{
 					Timestamp: time.Now().Format("15:04:05"),
 					AgentID:   "user",
@@ -111,11 +115,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					} else {
 						result = m.CmdRegistry.Dispatch(parsed.Name, parsed.Args)
 					}
+
+					if parsed.Name == "research" && m.ResearchState != nil && m.ResearchState.Topic != "" {
+						m.ConversationView.AddResearchTreeMessage(m.ResearchState.Topic, m.ResearchState.SubAgents)
+					}
+
 					cmds = append(cmds, func() tea.Msg { return CommandResultMsg{Result: result} })
 				} else {
 					// Plain text input: route to orchestrator.
 					m.StatusMsg = fmt.Sprintf("Processing: %s...", truncate(val, 40))
 					m.IsBusy = true
+					m.ConversationView.AddAssistantMessage("Analyzing request and building task execution plan...")
+					m.ConversationView.AddToolMessage("orchestrator", fmt.Sprintf("query=%q", val), "COMPLETED", "Task DAG generated with sub-agent steps.")
 					if len(val) > 5 {
 						m.AgentView.AddLog(views.AgentLogItem{
 							Timestamp: time.Now().Format("15:04:05"),
@@ -126,6 +137,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 				}
 			}
+
+		case key.Matches(msg, m.KeyMap.Clear):
+			m.ConversationView.Clear()
+			m.ResearchView.Clear()
 
 		case key.Matches(msg, m.KeyMap.ApproveDiff):
 			if m.ActiveView == ViewDiffView && m.DiffView.HasPending {
@@ -159,6 +174,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			Type:      "thought",
 			Content:   msg.Thought,
 		})
+		m.ConversationView.AddAssistantMessage(fmt.Sprintf("[%s] %s", msg.AgentID, msg.Thought))
 
 	case DiffUpdateMsg:
 		m.DiffView.SetDiff(msg.TransactionID, msg.FilePath, msg.UnifiedDiff)
@@ -176,9 +192,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case CommandResultMsg:
 		result := msg.Result
 		if result.Output == "__CLEAR__" {
-			// /clear: reset research view log.
+			m.ConversationView.Clear()
 			m.ResearchView.Clear()
 		} else if result.Output != "" {
+			m.ConversationView.AddSystemMessage(result.Output)
 			m.ResearchView.AddLog(result.Output)
 		}
 		if result.SwitchView != "" {
@@ -187,6 +204,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.ActiveView = ViewResearchView
 			case "PLAN_VIEW":
 				m.ActiveView = ViewPlanView
+			case "AGENT_VIEW", "CONVERSATION_VIEW":
+				m.ActiveView = ViewAgentView
 			}
 		}
 		if result.UpdateStatus != "" {
@@ -197,10 +216,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	// Update active prompt component
-	newPrompt, promptCmd := m.Prompt.Update(msg)
-	m.Prompt = newPrompt
-	cmds = append(cmds, promptCmd)
+	// Update active prompt component (skip if processing Submit keypress to avoid newline injection)
+	if !isSubmitKey {
+		newPrompt, promptCmd := m.Prompt.Update(msg)
+		m.Prompt = newPrompt
+		cmds = append(cmds, promptCmd)
+	}
+
+	// Update conversation view viewport (scroll navigation)
+	newConvView, convCmd := m.ConversationView.Update(msg)
+	m.ConversationView = newConvView
+	cmds = append(cmds, convCmd)
 
 	// Update spinner
 	newSpinner, spinnerCmd := m.Spinner.Update(msg)

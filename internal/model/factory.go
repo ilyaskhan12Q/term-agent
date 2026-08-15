@@ -6,11 +6,11 @@ import (
 )
 
 // SupportedProviders lists all provider names that can be instantiated by the factory.
-var SupportedProviders = []string{"openai", "anthropic", "gemini"}
+var SupportedProviders = []string{"openai", "anthropic", "gemini", "openrouter"}
 
 // ProviderConfig holds the configuration required to build a ModelProvider.
 type ProviderConfig struct {
-	// ProviderName is the canonical provider identifier ("openai", "anthropic", "gemini").
+	// ProviderName is the canonical provider identifier ("openai", "anthropic", "gemini", "openrouter").
 	ProviderName string
 	// Model is the model identifier string (e.g. "gpt-4o", "claude-sonnet-4-5", "gemini-1.5-pro").
 	Model string
@@ -57,6 +57,8 @@ func providerEnvVar(provider string) string {
 		return "ANTHROPIC_API_KEY"
 	case "gemini":
 		return "GEMINI_API_KEY"
+	case "openrouter":
+		return "OPENROUTER_API_KEY"
 	default:
 		return "PROVIDER_API_KEY"
 	}

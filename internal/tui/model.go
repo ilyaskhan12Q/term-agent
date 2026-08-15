@@ -25,25 +25,26 @@ const (
 
 // Model represents the complete Bubble Tea application state model.
 type Model struct {
-	ActiveView   ViewMode
-	StatusMsg    string
-	IsBusy       bool
-	Width        int
-	Height       int
-	Config       *config.Config
-	Styles       *styles.Styles
-	KeyMap       keymap.KeyMap
-	Header       *components.Header
-	StatusBar    *components.StatusBar
-	Prompt       *components.Prompt
-	Spinner      *components.Spinner
-	AgentView    *views.AgentView
-	PlanView     *views.PlanView
-	DiffView     *views.DiffView
-	LogView      *views.LogView
-	ResearchView *views.ResearchView
-	ContextUsed  int
-	ContextMax   int
+	ActiveView       ViewMode
+	StatusMsg        string
+	IsBusy           bool
+	Width            int
+	Height           int
+	Config           *config.Config
+	Styles           *styles.Styles
+	KeyMap           keymap.KeyMap
+	Header           *components.Header
+	StatusBar        *components.StatusBar
+	Prompt           *components.Prompt
+	Spinner          *components.Spinner
+	AgentView        *views.AgentView
+	ConversationView *views.ConversationView
+	PlanView         *views.PlanView
+	DiffView         *views.DiffView
+	LogView          *views.LogView
+	ResearchView     *views.ResearchView
+	ContextUsed      int
+	ContextMax       int
 	// CmdRegistry dispatches slash commands entered in the prompt.
 	CmdRegistry *commands.Registry
 	// ResearchState holds mutable research session state shared across commands.
@@ -61,27 +62,28 @@ func NewModel(cfg *config.Config) Model {
 	research.RegisterAll(reg, rs)
 
 	m := Model{
-		ActiveView:    ViewAgentView,
-		StatusMsg:     "Ready",
-		IsBusy:        false,
-		Width:         120,
-		Height:        35,
-		Config:        cfg,
-		Styles:        s,
-		KeyMap:        km,
-		Header:        components.NewHeader(s),
-		StatusBar:     components.NewStatusBar(s),
-		Prompt:        components.NewPrompt(s),
-		Spinner:       components.NewSpinner(s),
-		AgentView:     views.NewAgentView(s),
-		PlanView:      views.NewPlanView(s),
-		DiffView:      views.NewDiffView(s),
-		LogView:       views.NewLogView(s),
-		ResearchView:  views.NewResearchView(s),
-		ContextUsed:   14200,
-		ContextMax:    128000,
-		CmdRegistry:   reg,
-		ResearchState: rs,
+		ActiveView:       ViewAgentView,
+		StatusMsg:        "Ready",
+		IsBusy:           false,
+		Width:            120,
+		Height:           35,
+		Config:           cfg,
+		Styles:           s,
+		KeyMap:           km,
+		Header:           components.NewHeader(s),
+		StatusBar:        components.NewStatusBar(s),
+		Prompt:           components.NewPrompt(s),
+		Spinner:          components.NewSpinner(s),
+		AgentView:        views.NewAgentView(s),
+		ConversationView: views.NewConversationView(s),
+		PlanView:         views.NewPlanView(s),
+		DiffView:         views.NewDiffView(s),
+		LogView:          views.NewLogView(s),
+		ResearchView:     views.NewResearchView(s),
+		ContextUsed:      14200,
+		ContextMax:       128000,
+		CmdRegistry:      reg,
+		ResearchState:    rs,
 	}
 
 	m.Header.SetWidth(m.Width)
@@ -89,6 +91,7 @@ func NewModel(cfg *config.Config) Model {
 	m.Prompt.SetWidth(m.Width)
 
 	m.AgentView.SetSize(m.Width, m.Height-8)
+	m.ConversationView.SetSize(m.Width, m.Height-8)
 	m.PlanView.SetSize(m.Width, m.Height-8)
 	m.DiffView.SetSize(m.Width, m.Height-8)
 	m.LogView.SetSize(m.Width, m.Height-8)
@@ -123,13 +126,24 @@ func (m Model) View() string {
 		provider = m.Config.DefaultProvider
 		model = m.Config.DefaultModel
 	}
+	if m.ResearchState != nil {
+		if m.ResearchState.Provider != "" {
+			provider = m.ResearchState.Provider
+		}
+		if m.ResearchState.Model != "" {
+			model = m.ResearchState.Model
+		}
+		if m.ResearchState.SessionID != "" {
+			sessID = m.ResearchState.SessionID
+		}
+	}
 
 	headerStr := m.Header.Render(string(m.ActiveView), sessID, workspace)
 
 	var activeBody string
 	switch m.ActiveView {
 	case ViewAgentView:
-		activeBody = m.AgentView.Render()
+		activeBody = m.ConversationView.Render()
 	case ViewPlanView:
 		activeBody = m.PlanView.Render()
 	case ViewDiffView:
@@ -139,7 +153,7 @@ func (m Model) View() string {
 	case ViewResearchView:
 		activeBody = m.ResearchView.Render()
 	default:
-		activeBody = m.AgentView.Render()
+		activeBody = m.ConversationView.Render()
 	}
 
 	promptStr := m.Prompt.Render()

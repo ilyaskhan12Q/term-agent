@@ -81,6 +81,19 @@ func (t *ProvenanceTracker) RegisterEvidence(e domain.Evidence) error {
 	return nil
 }
 
+// UpdateEvidenceStatus updates the verification status of a registered evidence entity.
+func (t *ProvenanceTracker) UpdateEvidenceStatus(id string, status domain.EvidenceVerification) error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	ev, exists := t.evidence[id]
+	if !exists {
+		return fmt.Errorf("evidence ID '%s' not registered", id)
+	}
+	ev.VerificationStatus = status
+	t.evidence[id] = ev
+	return nil
+}
+
 // RegisterClaim records a Claim entity linked to registered Evidence IDs.
 func (t *ProvenanceTracker) RegisterClaim(c domain.Claim) error {
 	if c.ID == "" {

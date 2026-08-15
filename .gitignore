@@ -49,6 +49,9 @@ docs/
 .phase-status.md
 .phase_tracker.*
 prd_review.txt
+PRD.md
+PRD*.md
+
 
 # Local Agent & Scratch
 .gemini/

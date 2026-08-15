@@ -1,0 +1,43 @@
+{
+  "id": "system_architecture",
+  "name": "System Architecture Specification",
+  "description": "Comprehensive engineering specification detailing design goals, component boundaries, security models, and operational tradeoffs.",
+  "sections": [
+    {
+      "id": "overview",
+      "title": "System Overview",
+      "required": true,
+      "description": "High-level system purpose, problem statement, and operational scope."
+    },
+    {
+      "id": "design_goals",
+      "title": "1. Architectural Goals & Constraints",
+      "required": true,
+      "description": "Non-functional requirements including latency, scalability, availability, and security constraints."
+    },
+    {
+      "id": "component_spec",
+      "title": "2. Core Component Boundaries",
+      "required": true,
+      "description": "Detailed breakdown of system modules, APIs, data contracts, and storage engines."
+    },
+    {
+      "id": "security_data_flow",
+      "title": "3. Security Model & Data Flow",
+      "required": true,
+      "description": "Authentication, authorization, data isolation, and end-to-end data lifecycle."
+    },
+    {
+      "id": "tradeoffs_eval",
+      "title": "4. Architecture Trade-offs & Limitations",
+      "required": true,
+      "description": "Explicit analysis of design tradeoffs, bottleneck scenarios, and technical debt."
+    },
+    {
+      "id": "ops_deployment",
+      "title": "5. Operations & Deployment Topology",
+      "required": true,
+      "description": "Monitoring, telemetry, failover strategy, and deployment configuration."
+    }
+  ]
+}

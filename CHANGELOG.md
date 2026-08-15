@@ -8,27 +8,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- OpenCode interaction model featuring a unified linear `ConversationView` (`internal/tui/views/conversation_view.go`) with threaded messaging, interactive command blocks, and sub-agent research activity trees.
+- `OpenRouter` provider support via `openai.NewProviderWithURL` and custom provider name overrides in `internal/model/bootstrap` and `internal/model/openai`.
+- Specialist research worker pool (`WorkerPool`) executing `LITERATURE_AGENT`, `WEB_RESEARCH_AGENT`, `EXTRACTION_AGENT`, and `VERIFICATION_AGENT` in parallel.
+- `EvidenceVerifier` claim/entailment verification pipeline for research provenance tracking.
+- `SynthesisAgent` enhanced with LLM-backed paper synthesis, inline citation mapping (`[N]`), and status badges.
+- `PaperWriter` multi-format paper compiler supporting Markdown, LaTeX, HTML, and JSON outputs.
+- `ReviewerAgent` adversarial auditing for paper hallucination risk analysis and claim verification.
 - Phase 1 (Research Provider/Model Setup): Real OpenAI, Anthropic, and Gemini provider implementations with `net/http` clients.
 - `model.ProviderConfig` validation that produces actionable user-facing errors for missing provider, model, or API key.
 - `model.SupportedProviders` registry listing canonical provider identifiers.
 - `model.DefaultFactory` injectable factory pattern to decouple provider construction from the model package.
 - `internal/model/bootstrap` package that wires concrete provider implementations into the factory at startup.
 - `NewProviderWithURL` test constructors on all three providers enabling httptest-based unit testing without real API keys.
-- 13 unit tests covering config validation, factory registration, and HTTP round-trip behavior for all three providers.
 - Phase 2 (Research Slash Commands): Extensible slash-command registry (`internal/commands`) with `Command` interface, `Registry.Dispatch`, `Registry.HelpText`, and `Registry.Lookup`.
 - Input parser (`commands.Parse`) detecting `/cmd args` prefixes from raw prompt input.
 - 12 research slash commands: `/research`, `/topic`, `/plan`, `/sources`, `/status`, `/pause`, `/resume`, `/cancel`, `/export`, `/model`, `/help`, `/clear` with aliases (`/r`, `/s`, `/m`, `/h`, `/?`, `/cls`).
 - `ResearchState` shared mutable struct propagated across all commands; provider/model switchable at runtime.
-- TUI `update.go` wired to parse all prompt input: slash commands dispatched to registry; plain text routed to orchestrator.
 - `ResearchView.AddLog` / `ResearchView.Clear` methods enabling command output rendering in the research panel.
 - `ResearchState.Sources` field storing `[]domain.Source` instances collected during research sessions.
 - `/sources [query]` command extended to trigger real `AcademicSearchTool` searches and append results to session state.
 - `NewAcademicSearchToolWithURL`, `NewWebFetchToolWithClient`, and `NewPDFExtractorToolWithClient` constructors for dependency-injected testing.
 - Content-Type guards in `WebFetchTool` and `PDFExtractorTool` to reject non-text and non-PDF responses.
-- 14 comprehensive unit tests in `tests/unit/tools_research_test.go` covering arXiv Atom XML parsing, fallback search, web fetch HTML stripping, content-type security bounds, paywall detection, local PDF extraction, and citation entailment.
+- `ExecuteStepWithProject` method on `ResearchWorkerAgent` providing dynamic project ID context and automated extraction of `domain.Source` and `domain.Evidence` from tool output.
+- Thread-safe repository persistence and provenance registration during parallel worker pool execution.
+- `UpdateEvidenceStatus` thread-safe method on `ProvenanceTracker` for updating evidence verification states.
+- Evidence verification summary integration into `ResearchWorkflow.Execute` output payload.
+- Embedded 4 standard paper templates (`academic_research`, `technical_survey`, `executive_briefing`, `system_architecture`) into `TemplateEngine`.
+- Comprehensive unit and integration test suites covering research E2E execution, worker pools, synthesis, paper compilation, and claim verification.
+
+### Changed
+- Refactored `internal/tui/model.go` and `internal/tui/update.go` to route event streams, command results, user input, and viewport scrolling through the new `ConversationView`.
+- Refactored `ResearchState` handling to dynamically update status bar telemetry (provider and model name) upon `/model` slash command invocation.
+- Updated `/export` slash command to support `html` and `json` formats alongside `markdown`, `latex`, and `pdf`.
 
 ### Fixed
+- Resolved `domain.Evidence` field name inconsistencies across research slash commands (`Snippet`, `Location`, `VerificationStatus`).
+- Resolved command alias collision between `/questions` (renamed alias to `ques`) and `/quit` (alias `q`).
+- Fixed `openrouter` provider identification issue where `Name()` previously returned `openai` instead of `openrouter`, causing unit test failures in `TestBootstrap_BuildProvider_AllSupportedProviders`.
+- Fixed foreign key constraint failures during SQLite persistence by seeding parent session records in `ResearchWorkflow`.
 - Fixed `containsNegation` in `CitationVerifierTool` to use word boundary regex (`\b(not|no|...)\b`), eliminating false positives on words like "nodes".
+
+### Security
+- Prompt injection defense using immutable `<untrusted_content>` envelopes with SHA-256 integrity tags in `internal/security/isolation.go`.
+
+### Deprecated
+
+### Removed
 
 ## [0.8.0] - 2026-08-15
 

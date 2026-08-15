@@ -16,12 +16,6 @@ On top of this core orchestration engine, `term-agent` supports specialized vert
 - **[CONTRIBUTING](CONTRIBUTING.md)** — Guidelines for contributing and development workflows.
 - **[CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)** — Standard contributor code of conduct.
 - **[COMMIT_GUIDE](COMMIT_GUIDE.md)** — Conventional commit standards and rules.
-- **[Product Direction](docs/PRODUCT_DIRECTION.md)** — Architectural directives and product direction.
-- **[Research Mode Blueprint](docs/RESEARCH_WORKFLOW_ARCHITECTURAL_AUDIT.md)** — Architecture specification for Research Agent Mode.
-- **[PRD](PRD.md)** — Product Requirements Document (Source of Truth).
-- **[Requirement Traceability Matrix](docs/feature-matrix.md)** — Complete requirement mapping (FR, NFR, SEC, DB, CLI) with task and test coverage statuses.
-- **[Architecture Specification](docs/ARCHITECTURE.md)** — Subsystem layers and one-way dependency boundaries.
-- **[Security Model](docs/SECURITY_MODEL.md)** — Workspace isolation, path traversal defense, and POSIX AST shell risk classification.
 
 ---
 

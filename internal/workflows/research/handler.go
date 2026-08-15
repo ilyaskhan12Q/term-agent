@@ -134,6 +134,11 @@ func (w *ResearchWorkflow) Execute(ctx context.Context, bus events.EventBus) (*w
 	sessionID := "session-research-1"
 	templateID := "academic_research"
 
+	// Ensure parent session exists in sessions table for DB FK constraint
+	if w.db != nil {
+		_, _ = w.db.ExecContext(ctx, "INSERT OR IGNORE INTO sessions (id, workspace_path, status, created_at, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)", sessionID, "/tmp", "ACTIVE")
+	}
+
 	// 1. Create Research Project Entity
 	projectID := fmt.Sprintf("proj-%d", time.Now().UnixNano())
 	project, err := domain.NewResearchProject(projectID, sessionID, inputTopic, inputTopic, templateID)
@@ -152,63 +157,41 @@ func (w *ResearchWorkflow) Execute(ctx context.Context, bus events.EventBus) (*w
 		}
 	}
 
-	// 2. Execution Phase (Workers)
-	var findings []*domain.ResearchFinding
+	// 2. Execution Phase (Parallel Workers)
+	pool := ragents.NewWorkerPool(ragents.WorkerPoolOptions{
+		MaxConcurrency: 4,
+		ToolRegistry:   w.toolRegistry,
+		ResearchRepo:   w.researchRepo,
+		Tracker:        w.tracker,
+	})
 
-	for i, task := range plan.Tasks {
-		if task.AssignedTo == "SYNTHESIS_AGENT" {
-			continue
-		}
-
-		worker := ragents.NewResearchWorkerAgent(
-			fmt.Sprintf("worker-%d", i+1),
-			task.AssignedTo,
-			w.toolRegistry,
-		)
-
-		stepRes, err := worker.ExecuteStep(ctx, task.Description)
-		if err != nil {
-			return nil, fmt.Errorf("worker task '%s' failed: %w", task.ID, err)
-		}
-
-		qID := fmt.Sprintf("q-%s-%d", projectID, i+1)
-		finding, err := worker.GenerateFinding(projectID, qID, task.ID, stepRes)
-		if err == nil {
-			findings = append(findings, finding)
-			if w.researchRepo != nil {
-				_ = w.researchRepo.SaveFinding(ctx, finding)
-			}
-		}
+	findings, err := pool.ExecuteTasks(ctx, projectID, plan.Tasks)
+	if err != nil {
+		return nil, fmt.Errorf("worker execution failed: %w", err)
 	}
 
-	// Register sample provenance chain
-	src, _ := domain.NewSource("src-1", projectID, "Foundational Research Paper", "https://arxiv.org/abs/2401.00001", domain.SourceTypeAcademicPaper, 0.98)
-	if src != nil {
-		src.Authors = []string{"A. Researcher", "B. Scientist"}
-		src.Year = 2024
-		_, _ = w.tracker.RegisterSource(*src)
-
-		ev, _ := domain.NewEvidence("ev-1", projectID, src.ID, "Empirical benchmarks indicate significant accuracy gains.", "Page 4", "worker-2")
-		if ev != nil {
-			ev.VerificationStatus = domain.EvidenceStatusVerified
-			_ = w.tracker.RegisterEvidence(*ev)
-
-			claim := domain.Claim{
-				ID:          "claim-1",
-				ProjectID:   projectID,
-				Statement:   "Empirical benchmarks indicate significant accuracy gains.",
-				EvidenceIDs: []string{ev.ID},
-				Strength:    domain.ClaimDirect,
-			}
-			_ = w.tracker.RegisterClaim(claim)
-		}
-	}
+	// 2b. Evidence & Citation Verification Phase
+	verifier := provenance.NewEvidenceVerifier(w.tracker, w.toolRegistry)
+	verSummary, _ := verifier.VerifyFindings(ctx, projectID, findings)
 
 	// 3. Synthesis Phase
 	synthesizer := ragents.NewSynthesisAgent("synth-1", w.templateEngine)
-	paper, err := synthesizer.SynthesizePaper(ctx, project, findings, w.tracker)
+	paper, err := synthesizer.SynthesizePaperWithVerification(ctx, project, findings, w.tracker, verSummary)
 	if err != nil {
 		return nil, fmt.Errorf("paper synthesis failed: %w", err)
+	}
+
+	// 4. Reviewer & Hallucination Audit Phase
+	reviewer := ragents.NewReviewerAgent("reviewer-1")
+	review, err := reviewer.AuditPaper(ctx, paper, w.tracker, verSummary)
+	if err == nil && review != nil {
+		if review.Verdict == domain.ReviewVerdictApproved || review.FidelityScore >= 0.60 {
+			paper.Status = domain.PaperStatusPassed
+		} else if review.Verdict == domain.ReviewVerdictNeedsRevision {
+			paper.Status = domain.PaperStatusReviewing
+		} else {
+			paper.Status = domain.PaperStatusRejected
+		}
 	}
 
 	if w.researchRepo != nil {
@@ -223,12 +206,14 @@ func (w *ResearchWorkflow) Execute(ctx context.Context, bus events.EventBus) (*w
 	provReport := w.tracker.GenerateReport()
 
 	outputData := map[string]interface{}{
-		"project_id":        project.ID,
-		"paper_id":          paper.ID,
-		"template_id":       paper.TemplateID,
-		"paper_status":      string(paper.Status),
-		"sections_count":    len(paper.Sections),
-		"provenance_report": provReport,
+		"project_id":           project.ID,
+		"paper_id":             paper.ID,
+		"template_id":          paper.TemplateID,
+		"paper_status":         string(paper.Status),
+		"sections_count":       len(paper.Sections),
+		"provenance_report":    provReport,
+		"verification_summary": verSummary,
+		"paper_review":         review,
 	}
 
 	return &workflow.WorkflowResult{
