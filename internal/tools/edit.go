@@ -4,14 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/ilyaskhan/term-agent/internal/diff"
 	"github.com/ilyaskhan/term-agent/internal/mutation"
-	"github.com/ilyaskhan/term-agent/internal/security"
 	"github.com/ilyaskhan/term-agent/internal/workspace"
 )
 
@@ -133,15 +131,7 @@ func (t *EditFileTool) Execute(ctx context.Context, args json.RawMessage) (*Tool
 
 	origHash := a.BeforeHash
 	if origHash == "" {
-		absPath, err := security.ValidateWorkspacePath(t.workspaceRoot, a.Path)
-		if err == nil {
-			if diskBytes, err := os.ReadFile(absPath); err == nil {
-				origHash = workspace.HashBytes(diskBytes)
-			}
-		}
-		if origHash == "" {
-			origHash = workspace.HashBytes([]byte(currentContent))
-		}
+		origHash = workspace.HashBytes([]byte(currentContent))
 	}
 
 	mut := &mutation.FileMutation{
