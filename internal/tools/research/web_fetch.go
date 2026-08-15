@@ -43,6 +43,11 @@ func NewWebFetchTool() *WebFetchTool {
 	}
 }
 
+// NewWebFetchToolWithClient constructs a WebFetchTool with a custom HTTP client for unit testing.
+func NewWebFetchToolWithClient(client *http.Client) *WebFetchTool {
+	return &WebFetchTool{HTTPClient: client}
+}
+
 func (t *WebFetchTool) Spec() tools.ToolSpec {
 	params, _ := json.Marshal(map[string]interface{}{
 		"type": "object",
@@ -176,6 +181,23 @@ func (t *WebFetchTool) Execute(ctx context.Context, args json.RawMessage) (*tool
 			Duration: time.Since(start),
 			IsError:  true,
 		}, nil
+	}
+
+	// Guard: reject binary / non-text content types to prevent prompt injection via binary blobs.
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != "" {
+		ct := strings.ToLower(contentType)
+		if !strings.Contains(ct, "text/") &&
+			!strings.Contains(ct, "application/xhtml") &&
+			!strings.Contains(ct, "application/json") &&
+			!strings.Contains(ct, "application/xml") {
+			return &tools.ToolResult{
+				Output:   "",
+				Error:    fmt.Sprintf("web_fetch: unsupported content-type %q (only text/* content is permitted)", contentType),
+				Duration: time.Since(start),
+				IsError:  true,
+			}, nil
+		}
 	}
 
 	bodyBytes, err := io.ReadAll(io.LimitReader(resp.Body, int64(a.MaxBytes)))

@@ -21,8 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ResearchState` shared mutable struct propagated across all commands; provider/model switchable at runtime.
 - TUI `update.go` wired to parse all prompt input: slash commands dispatched to registry; plain text routed to orchestrator.
 - `ResearchView.AddLog` / `ResearchView.Clear` methods enabling command output rendering in the research panel.
-- `CommandResultMsg` Bubble Tea message enabling async command result delivery to the TUI event loop.
-- 22 unit tests covering parser, registry, all commands, aliases, and error paths.
+- `ResearchState.Sources` field storing `[]domain.Source` instances collected during research sessions.
+- `/sources [query]` command extended to trigger real `AcademicSearchTool` searches and append results to session state.
+- `NewAcademicSearchToolWithURL`, `NewWebFetchToolWithClient`, and `NewPDFExtractorToolWithClient` constructors for dependency-injected testing.
+- Content-Type guards in `WebFetchTool` and `PDFExtractorTool` to reject non-text and non-PDF responses.
+- 14 comprehensive unit tests in `tests/unit/tools_research_test.go` covering arXiv Atom XML parsing, fallback search, web fetch HTML stripping, content-type security bounds, paywall detection, local PDF extraction, and citation entailment.
+
+### Fixed
+- Fixed `containsNegation` in `CitationVerifierTool` to use word boundary regex (`\b(not|no|...)\b`), eliminating false positives on words like "nodes".
 
 ## [0.8.0] - 2026-08-15
 

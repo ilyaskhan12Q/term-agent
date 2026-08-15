@@ -4,10 +4,14 @@
 package research
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/ilyaskhan/term-agent/internal/commands"
+	rtools "github.com/ilyaskhan/term-agent/internal/tools/research"
+	"github.com/ilyaskhan/term-agent/internal/workflows/research/domain"
 )
 
 // ResearchState holds mutable research session state that commands read/write.
@@ -31,6 +35,8 @@ type ResearchState struct {
 	SourceCount int
 	// ActivePlan is a human-readable summary of the current task plan.
 	ActivePlan string
+	// Sources is the collection of domain.Source items gathered during research.
+	Sources []domain.Source
 }
 
 // NewResearchState returns a default ResearchState.
@@ -40,6 +46,7 @@ func NewResearchState() *ResearchState {
 		Provider:     "openai",
 		Model:        "gpt-4o",
 		ExportFormat: "markdown",
+		Sources:      make([]domain.Source, 0),
 	}
 }
 
@@ -144,17 +151,68 @@ func (c *planCmd) Execute(args []string) commands.CommandResult {
 
 type sourcesCmd struct{ state *ResearchState }
 
-func (c *sourcesCmd) Name() string        { return "sources" }
-func (c *sourcesCmd) Aliases() []string   { return nil }
-func (c *sourcesCmd) Description() string { return "Show sources collected so far in the research." }
-func (c *sourcesCmd) Usage() string       { return "/sources" }
+func (c *sourcesCmd) Name() string      { return "sources" }
+func (c *sourcesCmd) Aliases() []string { return nil }
+func (c *sourcesCmd) Description() string {
+	return "Show or search academic sources. Usage: /sources [search query]"
+}
+func (c *sourcesCmd) Usage() string { return "/sources [search query]" }
 
 func (c *sourcesCmd) Execute(args []string) commands.CommandResult {
-	if c.state.Topic == "" {
-		return commands.CommandResult{Output: "No active research session."}
+	if len(args) > 0 {
+		query := strings.Join(args, " ")
+		tool := rtools.NewAcademicSearchTool()
+		toolArgs, _ := json.Marshal(rtools.AcademicSearchArgs{
+			Query:      query,
+			ProjectID:  "research-session",
+			MaxResults: 5,
+		})
+
+		res, err := tool.Execute(context.Background(), toolArgs)
+		if err != nil || res.IsError {
+			errMsg := res.Error
+			if err != nil {
+				errMsg = err.Error()
+			}
+			return commands.CommandResult{
+				Output: fmt.Sprintf("Error searching sources: %s", errMsg),
+			}
+		}
+
+		var fetched []domain.Source
+		if err := json.Unmarshal([]byte(res.Output), &fetched); err == nil {
+			c.state.Sources = append(c.state.Sources, fetched...)
+			c.state.SourceCount = len(c.state.Sources)
+		}
+
+		var b strings.Builder
+		b.WriteString(fmt.Sprintf("Academic Search Results for %q:\n", query))
+		for i, s := range fetched {
+			b.WriteString(fmt.Sprintf("%d. %s (%d) - %s\n   URI: %s\n", i+1, s.Title, s.Year, s.Publisher, s.URI))
+		}
+		b.WriteString(fmt.Sprintf("\nTotal collected sources in session: %d", c.state.SourceCount))
+
+		return commands.CommandResult{
+			Output:     b.String(),
+			SwitchView: "RESEARCH_VIEW",
+		}
 	}
+
+	if len(c.state.Sources) == 0 {
+		return commands.CommandResult{
+			Output:     fmt.Sprintf("Sources collected: %d\nNo individual sources logged yet. Use /sources <query> to search.", c.state.SourceCount),
+			SwitchView: "RESEARCH_VIEW",
+		}
+	}
+
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("Collected Sources (%d):\n", len(c.state.Sources)))
+	for i, s := range c.state.Sources {
+		b.WriteString(fmt.Sprintf("%d. %s (%d) [%s]\n   URI: %s\n", i+1, s.Title, s.Year, s.SourceType, s.URI))
+	}
+
 	return commands.CommandResult{
-		Output:     fmt.Sprintf("Sources collected: %d\nStatus: %s", c.state.SourceCount, c.state.Status),
+		Output:     b.String(),
 		SwitchView: "RESEARCH_VIEW",
 	}
 }
