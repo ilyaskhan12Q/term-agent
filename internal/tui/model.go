@@ -3,6 +3,8 @@ package tui
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/ilyaskhan/term-agent/internal/commands"
+	research "github.com/ilyaskhan/term-agent/internal/commands/research"
 	"github.com/ilyaskhan/term-agent/internal/config"
 	"github.com/ilyaskhan/term-agent/internal/tui/components"
 	"github.com/ilyaskhan/term-agent/internal/tui/keymap"
@@ -42,6 +44,10 @@ type Model struct {
 	ResearchView *views.ResearchView
 	ContextUsed  int
 	ContextMax   int
+	// CmdRegistry dispatches slash commands entered in the prompt.
+	CmdRegistry *commands.Registry
+	// ResearchState holds mutable research session state shared across commands.
+	ResearchState *research.ResearchState
 }
 
 // NewModel initializes the root TUI model with default components and sub-views.
@@ -49,26 +55,33 @@ func NewModel(cfg *config.Config) Model {
 	s := styles.NewStyles()
 	km := keymap.DefaultKeyMap()
 
+	// Bootstrap command registry with all research commands.
+	reg := commands.NewRegistry()
+	rs := research.NewResearchState()
+	research.RegisterAll(reg, rs)
+
 	m := Model{
-		ActiveView:   ViewAgentView,
-		StatusMsg:    "Ready",
-		IsBusy:       false,
-		Width:        120,
-		Height:       35,
-		Config:       cfg,
-		Styles:       s,
-		KeyMap:       km,
-		Header:       components.NewHeader(s),
-		StatusBar:    components.NewStatusBar(s),
-		Prompt:       components.NewPrompt(s),
-		Spinner:      components.NewSpinner(s),
-		AgentView:    views.NewAgentView(s),
-		PlanView:     views.NewPlanView(s),
-		DiffView:     views.NewDiffView(s),
-		LogView:      views.NewLogView(s),
-		ResearchView: views.NewResearchView(s),
-		ContextUsed:  14200,
-		ContextMax:   128000,
+		ActiveView:    ViewAgentView,
+		StatusMsg:     "Ready",
+		IsBusy:        false,
+		Width:         120,
+		Height:        35,
+		Config:        cfg,
+		Styles:        s,
+		KeyMap:        km,
+		Header:        components.NewHeader(s),
+		StatusBar:     components.NewStatusBar(s),
+		Prompt:        components.NewPrompt(s),
+		Spinner:       components.NewSpinner(s),
+		AgentView:     views.NewAgentView(s),
+		PlanView:      views.NewPlanView(s),
+		DiffView:      views.NewDiffView(s),
+		LogView:       views.NewLogView(s),
+		ResearchView:  views.NewResearchView(s),
+		ContextUsed:   14200,
+		ContextMax:    128000,
+		CmdRegistry:   reg,
+		ResearchState: rs,
 	}
 
 	m.Header.SetWidth(m.Width)

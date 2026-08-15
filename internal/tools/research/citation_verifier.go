@@ -179,14 +179,10 @@ func EvaluateClaimEvidenceEntailment(claim, snippet string) (domain.EvidenceVeri
 		fmt.Sprintf("Unverified/Mismatch: Insufficient keyword overlap (%.1f%%) between claim and evidence snippet.", overlapRatio*100)
 }
 
+var reNegation = regexp.MustCompile(`\b(not|no|never|fail|failed|unlikely|disprove|reject|absence)\b`)
+
 func containsNegation(s string) bool {
-	negations := []string{"not", "no", "never", "fail", "failed", "unlikely", "disprove", "reject", "absence"}
-	for _, neg := range negations {
-		if strings.Contains(s, neg) {
-			return true
-		}
-	}
-	return false
+	return reNegation.MatchString(s)
 }
 
 func mathMin(a, b float64) float64 {

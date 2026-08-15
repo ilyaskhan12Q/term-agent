@@ -8,8 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Phase 9 parallel specialist researcher orchestration architecture.
-- Parallel worker pool scheduling and concurrency error group management.
+- Phase 1 (Research Provider/Model Setup): Real OpenAI, Anthropic, and Gemini provider implementations with `net/http` clients.
+- `model.ProviderConfig` validation that produces actionable user-facing errors for missing provider, model, or API key.
+- `model.SupportedProviders` registry listing canonical provider identifiers.
+- `model.DefaultFactory` injectable factory pattern to decouple provider construction from the model package.
+- `internal/model/bootstrap` package that wires concrete provider implementations into the factory at startup.
+- `NewProviderWithURL` test constructors on all three providers enabling httptest-based unit testing without real API keys.
+- 13 unit tests covering config validation, factory registration, and HTTP round-trip behavior for all three providers.
+- Phase 2 (Research Slash Commands): Extensible slash-command registry (`internal/commands`) with `Command` interface, `Registry.Dispatch`, `Registry.HelpText`, and `Registry.Lookup`.
+- Input parser (`commands.Parse`) detecting `/cmd args` prefixes from raw prompt input.
+- 12 research slash commands: `/research`, `/topic`, `/plan`, `/sources`, `/status`, `/pause`, `/resume`, `/cancel`, `/export`, `/model`, `/help`, `/clear` with aliases (`/r`, `/s`, `/m`, `/h`, `/?`, `/cls`).
+- `ResearchState` shared mutable struct propagated across all commands; provider/model switchable at runtime.
+- TUI `update.go` wired to parse all prompt input: slash commands dispatched to registry; plain text routed to orchestrator.
+- `ResearchView.AddLog` / `ResearchView.Clear` methods enabling command output rendering in the research panel.
+- `ResearchState.Sources` field storing `[]domain.Source` instances collected during research sessions.
+- `/sources [query]` command extended to trigger real `AcademicSearchTool` searches and append results to session state.
+- `NewAcademicSearchToolWithURL`, `NewWebFetchToolWithClient`, and `NewPDFExtractorToolWithClient` constructors for dependency-injected testing.
+- Content-Type guards in `WebFetchTool` and `PDFExtractorTool` to reject non-text and non-PDF responses.
+- 14 comprehensive unit tests in `tests/unit/tools_research_test.go` covering arXiv Atom XML parsing, fallback search, web fetch HTML stripping, content-type security bounds, paywall detection, local PDF extraction, and citation entailment.
+
+### Fixed
+- Fixed `containsNegation` in `CitationVerifierTool` to use word boundary regex (`\b(not|no|...)\b`), eliminating false positives on words like "nodes".
 
 ## [0.8.0] - 2026-08-15
 

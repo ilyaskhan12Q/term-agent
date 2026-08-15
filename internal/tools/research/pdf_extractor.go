@@ -41,6 +41,11 @@ func NewPDFExtractorTool() *PDFExtractorTool {
 	}
 }
 
+// NewPDFExtractorToolWithClient constructs a PDFExtractorTool with a custom HTTP client for unit testing.
+func NewPDFExtractorToolWithClient(client *http.Client) *PDFExtractorTool {
+	return &PDFExtractorTool{HTTPClient: client}
+}
+
 func (t *PDFExtractorTool) Spec() tools.ToolSpec {
 	params, _ := json.Marshal(map[string]interface{}{
 		"type": "object",
@@ -183,6 +188,14 @@ func (t *PDFExtractorTool) fetchRemotePDF(ctx context.Context, uri string) ([]by
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("remote PDF server returned status %d", resp.StatusCode)
+	}
+
+	// Guard: only accept application/pdf or octet-stream to prevent fetching HTML or other content.
+	contentType := strings.ToLower(resp.Header.Get("Content-Type"))
+	if contentType != "" &&
+		!strings.Contains(contentType, "application/pdf") &&
+		!strings.Contains(contentType, "application/octet-stream") {
+		return nil, fmt.Errorf("pdf_extractor: unexpected content-type %q (expected application/pdf)", contentType)
 	}
 
 	return io.ReadAll(io.LimitReader(resp.Body, 5*1024*1024)) // 5MB limit

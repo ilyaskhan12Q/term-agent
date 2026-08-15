@@ -43,6 +43,8 @@ type atomAuthor struct {
 
 type AcademicSearchTool struct {
 	HTTPClient *http.Client
+	// BaseURL overrides the arXiv API endpoint; used in unit tests only.
+	BaseURL string
 }
 
 func NewAcademicSearchTool() *AcademicSearchTool {
@@ -50,6 +52,14 @@ func NewAcademicSearchTool() *AcademicSearchTool {
 		HTTPClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
+	}
+}
+
+// NewAcademicSearchToolWithURL constructs a tool with a custom API base URL for unit testing.
+func NewAcademicSearchToolWithURL(baseURL string) *AcademicSearchTool {
+	return &AcademicSearchTool{
+		HTTPClient: &http.Client{Timeout: 5 * time.Second},
+		BaseURL:    baseURL,
 	}
 }
 
@@ -142,8 +152,12 @@ func (t *AcademicSearchTool) Execute(ctx context.Context, args json.RawMessage) 
 }
 
 func (t *AcademicSearchTool) fetchArXivSources(ctx context.Context, projectID, query string, maxResults int) ([]domain.Source, error) {
-	apiURL := fmt.Sprintf("http://export.arxiv.org/api/query?search_query=all:%s&start=0&max_results=%d",
-		url.QueryEscape(query), maxResults)
+	baseURL := "http://export.arxiv.org/api/query"
+	if t.BaseURL != "" {
+		baseURL = t.BaseURL
+	}
+	apiURL := fmt.Sprintf("%s?search_query=all:%s&start=0&max_results=%d",
+		baseURL, url.QueryEscape(query), maxResults)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
 	if err != nil {

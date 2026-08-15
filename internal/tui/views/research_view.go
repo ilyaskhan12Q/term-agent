@@ -27,6 +27,8 @@ type ResearchView struct {
 	SourcesCount int
 	Findings     []ResearchFindingSummary
 	PaperPreview string
+	// CommandLog holds lines of output from slash commands, shown in the view.
+	CommandLog []string
 }
 
 // NewResearchView creates ResearchView instance with initial placeholder state.
@@ -58,6 +60,16 @@ func (v *ResearchView) SetSize(w, h int) {
 	v.height = h
 }
 
+// AddLog appends a line of command output to the view log.
+func (v *ResearchView) AddLog(line string) {
+	v.CommandLog = append(v.CommandLog, line)
+}
+
+// Clear removes all command log entries.
+func (v *ResearchView) Clear() {
+	v.CommandLog = nil
+}
+
 // UpdateProject updates research mode view data.
 func (v *ResearchView) UpdateProject(title, template string, sources int, findings []ResearchFindingSummary, paper string) {
 	v.ProjectTitle = title
@@ -68,9 +80,28 @@ func (v *ResearchView) UpdateProject(title, template string, sources int, findin
 }
 
 // Render draws the research project dashboard and paper preview.
+// If CommandLog is non-empty, it renders the log output instead of the static dashboard.
 func (v *ResearchView) Render() string {
 	var b strings.Builder
-	b.WriteString(v.styles.PanelTitle.Render("🎓 Research Agent Mode — Workspace & Provenance Dashboard"))
+
+	panelStyle := lipgloss.NewStyle().
+		Width(v.width - 4).
+		Height(v.height - 2).
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color(v.styles.Tokens.BorderColor)).
+		Padding(1)
+
+	if len(v.CommandLog) > 0 {
+		b.WriteString(v.styles.PanelTitle.Render("Research Mode — Command Output"))
+		b.WriteString("\n\n")
+		for _, line := range v.CommandLog {
+			b.WriteString(line)
+			b.WriteString("\n\n")
+		}
+		return panelStyle.Render(b.String())
+	}
+
+	b.WriteString(v.styles.PanelTitle.Render("Research Agent Mode — Workspace & Provenance Dashboard"))
 	b.WriteString("\n\n")
 
 	// Project Header
@@ -82,17 +113,17 @@ func (v *ResearchView) Render() string {
 	b.WriteString(header)
 
 	// Findings & Provenance Table
-	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(v.styles.Tokens.PrimaryColor)).Render("📌 Gathered Findings & Verified Claims"))
+	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(v.styles.Tokens.PrimaryColor)).Render("Gathered Findings & Verified Claims"))
 	b.WriteString("\n")
 
 	tableHeader := fmt.Sprintf("%-10s %-45s %-12s %-12s %-15s\n", "ID", "Finding Topic", "Claims", "Evidence", "Provenance State")
 	b.WriteString(v.styles.DiffContext.Render(tableHeader))
-	b.WriteString(v.styles.DiffContext.Render(strings.Repeat("─", 95)) + "\n")
+	b.WriteString(v.styles.DiffContext.Render(strings.Repeat("-", 95)) + "\n")
 
 	for _, f := range v.Findings {
-		provStatus := v.styles.TaskComplete.Render(fmt.Sprintf("✔ Verified (%d/%d)", f.VerifiedClaims, f.ClaimsCount))
+		provStatus := v.styles.TaskComplete.Render(fmt.Sprintf("Verified (%d/%d)", f.VerifiedClaims, f.ClaimsCount))
 		if f.VerifiedClaims < f.ClaimsCount {
-			provStatus = v.styles.TaskRunning.Render(fmt.Sprintf("◐ Partial (%d/%d)", f.VerifiedClaims, f.ClaimsCount))
+			provStatus = v.styles.TaskRunning.Render(fmt.Sprintf("Partial (%d/%d)", f.VerifiedClaims, f.ClaimsCount))
 		}
 
 		b.WriteString(fmt.Sprintf("%-10s %-45s %-12d %-12d %-15s\n",
@@ -106,7 +137,7 @@ func (v *ResearchView) Render() string {
 
 	b.WriteString("\n\n")
 	// Paper Synthesis Preview Box
-	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(v.styles.Tokens.SecondaryColor)).Render("📄 Generated Research Paper Preview"))
+	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(v.styles.Tokens.SecondaryColor)).Render("Generated Research Paper Preview"))
 	b.WriteString("\n")
 
 	paperBox := lipgloss.NewStyle().
@@ -119,14 +150,5 @@ func (v *ResearchView) Render() string {
 
 	b.WriteString(paperBox)
 
-	content := b.String()
-
-	panelStyle := lipgloss.NewStyle().
-		Width(v.width - 4).
-		Height(v.height - 2).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color(v.styles.Tokens.BorderColor)).
-		Padding(1)
-
-	return panelStyle.Render(content)
+	return panelStyle.Render(b.String())
 }

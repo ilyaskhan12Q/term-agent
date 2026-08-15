@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ilyaskhan/term-agent/internal/commands"
 	"github.com/ilyaskhan/term-agent/internal/tui/views"
 )
 
@@ -37,6 +38,11 @@ type EventLogMsg struct {
 // PromptSubmitMsg represents user submitting input from prompt box.
 type PromptSubmitMsg struct {
 	Text string
+}
+
+// CommandResultMsg delivers a slash-command execution result to the update loop.
+type CommandResultMsg struct {
+	Result commands.CommandResult
 }
 
 // Update handles incoming events, keyboard input, and state transitions.
@@ -88,9 +94,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			val := m.Prompt.Value()
 			if val != "" {
 				m.Prompt.Reset()
-				m.StatusMsg = fmt.Sprintf("Processing prompt: %s...", val)
-				m.IsBusy = true
-
+				// Echo user input to the agent log.
 				m.AgentView.AddLog(views.AgentLogItem{
 					Timestamp: time.Now().Format("15:04:05"),
 					AgentID:   "user",
@@ -98,14 +102,28 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					Content:   val,
 				})
 
-				// If input contains research keywords, automatically jump to Research View
-				if len(val) > 5 {
-					m.AgentView.AddLog(views.AgentLogItem{
-						Timestamp: time.Now().Format("15:04:05"),
-						AgentID:   "orchestrator",
-						Type:      "thought",
-						Content:   "Analyzing request and building task DAG plan...",
-					})
+				parsed := commands.Parse(val)
+				if parsed.IsCommand {
+					// /help is intercepted here so the registry can provide its own output.
+					var result commands.CommandResult
+					if parsed.Name == "help" || parsed.Name == "h" || parsed.Name == "?" {
+						result = commands.CommandResult{Output: m.CmdRegistry.HelpText()}
+					} else {
+						result = m.CmdRegistry.Dispatch(parsed.Name, parsed.Args)
+					}
+					cmds = append(cmds, func() tea.Msg { return CommandResultMsg{Result: result} })
+				} else {
+					// Plain text input: route to orchestrator.
+					m.StatusMsg = fmt.Sprintf("Processing: %s...", truncate(val, 40))
+					m.IsBusy = true
+					if len(val) > 5 {
+						m.AgentView.AddLog(views.AgentLogItem{
+							Timestamp: time.Now().Format("15:04:05"),
+							AgentID:   "orchestrator",
+							Type:      "thought",
+							Content:   "Analyzing request and building task DAG plan...",
+						})
+					}
 				}
 			}
 
@@ -154,6 +172,29 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			Component: msg.Component,
 			Message:   msg.Message,
 		})
+
+	case CommandResultMsg:
+		result := msg.Result
+		if result.Output == "__CLEAR__" {
+			// /clear: reset research view log.
+			m.ResearchView.Clear()
+		} else if result.Output != "" {
+			m.ResearchView.AddLog(result.Output)
+		}
+		if result.SwitchView != "" {
+			switch result.SwitchView {
+			case "RESEARCH_VIEW":
+				m.ActiveView = ViewResearchView
+			case "PLAN_VIEW":
+				m.ActiveView = ViewPlanView
+			}
+		}
+		if result.UpdateStatus != "" {
+			m.StatusMsg = result.UpdateStatus
+		}
+		if result.Quit {
+			return m, tea.Quit
+		}
 	}
 
 	// Update active prompt component
@@ -180,4 +221,13 @@ func (m *Model) rotateTab(delta int) {
 	}
 	newIdx := (currIdx + delta + len(tabList)) % len(tabList)
 	m.ActiveView = tabList[newIdx]
+}
+
+// truncate shortens s to at most maxLen runes, appending "..." if trimmed.
+func truncate(s string, maxLen int) string {
+	r := []rune(s)
+	if len(r) <= maxLen {
+		return s
+	}
+	return string(r[:maxLen]) + "..."
 }
