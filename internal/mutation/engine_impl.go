@@ -141,7 +141,7 @@ func (e *DefaultMutationEngine) CommitTransaction(ctx context.Context, tx *Trans
 
 	tx.Status = TxStatusCommitting
 
-	for _, mut := range tx.Mutations {
+	for i, mut := range tx.Mutations {
 		absPath, err := security.ValidateWorkspacePath(e.workspaceRoot, mut.Path)
 		if err != nil {
 			e.rollbackInternal(tx)
@@ -149,6 +149,21 @@ func (e *DefaultMutationEngine) CommitTransaction(ctx context.Context, tx *Trans
 			return fmt.Errorf("security validation failed during commit: %w", err)
 		}
 
+		// Re-verify OCC check right before applying changes
+		if mut.Type != MutationCreate && mut.OriginalHash != "" {
+			if diskBytes, err := os.ReadFile(absPath); err == nil {
+				currentHash := workspace.HashBytes(diskBytes)
+				if currentHash != mut.OriginalHash {
+					tx.Status = TxStatusConflict
+					return fmt.Errorf("%w for path %s (expected %s, got %s)", ErrConcurrencyConflict, mut.Path, mut.OriginalHash, currentHash)
+				}
+			} else if mut.Type == MutationModify {
+				tx.Status = TxStatusFailed
+				return fmt.Errorf("cannot modify non-existent file during commit: %s", mut.Path)
+			}
+		}
+
+		_ = i // placeholder if index unused
 		switch mut.Type {
 		case MutationCreate, MutationModify:
 			dir := filepath.Dir(absPath)
