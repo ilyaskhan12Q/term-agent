@@ -1,32 +1,31 @@
 # term-agent — Multi-Agent Orchestration Engine & Research Agent Platform
 
-`term-agent` is a production-grade, local-first **generic multi-agent orchestration engine** built in Go. It provides high-performance task decomposition, DAG scheduling, parallel worker execution, model provider abstractions, context memory budgeting, persistent SQLite event tracking, and an interactive Bubble Tea terminal user interface.
+`term-agent` is a production-grade, local-first multi-agent orchestration engine built in Go. It provides high-performance task decomposition, Directed Acyclic Graph (DAG) plan scheduling, parallel worker execution, model provider abstractions, context memory budgeting, persistent SQLite event tracking, and an interactive Bubble Tea terminal user interface.
 
 On top of this core orchestration engine, `term-agent` supports specialized vertical domain workflows. Its primary flagship workflow is **Research Agent Mode** — an automated deep research system with literature discovery, evidence extraction, citation verification, and academic paper synthesis.
 
-> **Core Architectural Principle:**  
+> **Core Architectural Principle:**
 > *The model proposes. The engine orchestrates. The user approves. The transaction commits.*
 
 ---
 
-## 📚 Project Documentation & Governance
+## Project Documentation & Governance
 
-- **[Product Direction](docs/PRODUCT_DIRECTION.md)** — **Permanent core product direction and architectural directives.**
-- **[Research Mode Audit & Blueprint](docs/RESEARCH_WORKFLOW_ARCHITECTURAL_AUDIT.md)** — Comprehensive architecture specification for Research Agent Mode.
-- **[PRD.md](PRD.md)** — Production-Grade Product Requirements Document (Source of Truth).
+- **[CHANGELOG](CHANGELOG.md)** — Version history and release notes following Keep a Changelog.
+- **[SECURITY](SECURITY.md)** — Security policy, threat model, and prompt injection defense.
+- **[CONTRIBUTING](CONTRIBUTING.md)** — Guidelines for contributing and development workflows.
+- **[CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)** — Standard contributor code of conduct.
+- **[COMMIT_GUIDE](COMMIT_GUIDE.md)** — Conventional commit standards and rules.
+- **[Product Direction](docs/PRODUCT_DIRECTION.md)** — Architectural directives and product direction.
+- **[Research Mode Blueprint](docs/RESEARCH_WORKFLOW_ARCHITECTURAL_AUDIT.md)** — Architecture specification for Research Agent Mode.
+- **[PRD](PRD.md)** — Product Requirements Document (Source of Truth).
 - **[Requirement Traceability Matrix](docs/feature-matrix.md)** — Complete requirement mapping (FR, NFR, SEC, DB, CLI) with task and test coverage statuses.
-- **[Architecture Specification](docs/ARCHITECTURE.md)** — Subsystem layers, structural rules, and one-way dependency boundaries.
-- **[Security Model](docs/SECURITY_MODEL.md)** — Workspace isolation, path traversal defense, and non-naive shell risk classification.
-- **[Agent Execution Lifecycle](docs/AGENT_LIFECYCLE.md)** — 6-stage runtime execution pipeline.
-- **[Phase 0 Audit Report](docs/PHASE_0_AUDIT.md)** — Verified engineering baseline and readiness analysis.
-- **Architectural Decision Records**:
-  - [ADR 0001: SQLite Storage with WAL Mode](docs/adr/0001-sqlite-storage.md)
-  - [ADR 0002: Bubble Tea Framework for Terminal UI](docs/adr/0002-bubbletea-tui.md)
-  - [ADR 0003: Transactional Mutation Engine](docs/adr/0003-mutation-engine-safety.md)
+- **[Architecture Specification](docs/ARCHITECTURE.md)** — Subsystem layers and one-way dependency boundaries.
+- **[Security Model](docs/SECURITY_MODEL.md)** — Workspace isolation, path traversal defense, and POSIX AST shell risk classification.
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Layer | Technology |
 |---|---|
@@ -38,7 +37,22 @@ On top of this core orchestration engine, `term-agent` supports specialized vert
 
 ---
 
-## 🧪 Development & Quality Gates
+## Command Line Interface (CLI)
+
+```bash
+# Build the binary
+go build -o term-agent ./cmd/term-agent
+
+# Execute default terminal agent mode
+./term-agent --workspace ./path/to/project
+
+# Execute specialized Research Agent mode
+./term-agent --workflow research --prompt "Investigate Transformer Architecture Memory Scaling"
+```
+
+---
+
+## Development & Quality Gates
 
 Run the verification suite before committing any change:
 
@@ -61,26 +75,28 @@ go build ./...
 
 ---
 
-## 📋 Feature Roadmap & Phase Status
+## Implementation Phase Status
 
-| Phase | Description | Status |
+| Phase | Component Description | Status |
 |---|---|---|
-| **Phase 0** | Project Skeleton & Architecture Foundation | `PHASE_1_READY_WITH_WARNINGS` |
-| **Phase 1** | Application Lifecycle & CLI Setup | `NOT_STARTED` |
-| **Phase 2** | Bubble Tea Terminal UI | `NOT_STARTED` |
-| **Phase 3** | Workspace Discovery & Engine | `NOT_STARTED` |
-| **Phase 4** | Mutation Engine & Optimistic OCC | `NOT_STARTED` |
-| **Phase 5** | Tool Runtime & Shell Sandbox | `NOT_STARTED` |
-| **Phase 6** | Security Policy Engine & AST Classifier | `NOT_STARTED` |
-| **Phase 7** | Single Agent Execution Loop | `NOT_STARTED` |
-| **Phase 8** | Context Budgeting & Compaction | `NOT_STARTED` |
-| **Phase 9** | Scheduler & Bounded Worker Pool | `NOT_STARTED` |
-| **Phase 10** | Hierarchical Multi-Agent System | `NOT_STARTED` |
-| **Phase 11** | Multi-Provider Engine (OpenAI/Anthropic/Gemini) | `NOT_STARTED` |
-| **Phase 12** | Production Hardening | `NOT_STARTED` |
+| **Phase 0** | Project Skeleton & Architecture Foundation | `VERIFIED` |
+| **Phase 1** | Application Lifecycle & CLI Setup | `VERIFIED` |
+| **Phase 2** | Bubble Tea Terminal UI | `VERIFIED` |
+| **Phase 3** | Workspace Discovery & Engine | `VERIFIED` |
+| **Phase 4** | Mutation Engine & Optimistic OCC | `VERIFIED` |
+| **Phase 5** | Tool Runtime & Shell Sandbox | `VERIFIED` |
+| **Phase 6** | Security Policy Engine & AST Classifier | `VERIFIED` |
+| **Phase 7** | Real Research & Source Tools (arXiv, Web, PDF, Citation Verifier) | `VERIFIED` |
+| **Phase 8** | Provenance Tracking & Task Decomposition (Planner DAG, Deduplication) | `VERIFIED` |
+| **Phase 9** | Parallel Specialist Researchers | `IN_PROGRESS` |
+| **Phase 10** | Evidence & Citation Verification | `NOT_STARTED` |
+| **Phase 11** | Research Synthesis | `NOT_STARTED` |
+| **Phase 12** | Global Paper Templates & Writer | `NOT_STARTED` |
+| **Phase 13** | Reviewer & Hallucination/Claim Detection | `NOT_STARTED` |
+| **Phase 14** | Full End-to-End Research Mode | `NOT_STARTED` |
 
 ---
 
-## 📜 License
+## License
 
-Distributed under the MIT License.
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.

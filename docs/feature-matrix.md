@@ -28,11 +28,13 @@ This document maintains full traceability between requirements specified in `PRD
 | **FR-09**: Read-Only Workspace Search & Inspections | PHASE_3 | TASK-3.2 | `internal/tools/search.go`, `internal/tools/read.go`, `internal/tools/list.go` | `tests/unit/workspace_test.go` | `VERIFIED` |
 | **FR-10**: Optimistic Concurrency Control (`before_hash`) | PHASE_4 | TASK-4.1 | `internal/mutation/engine_impl.go`, `internal/workspace/hashing.go` | `tests/unit/mutation_test.go`, `tests/integration/mutation_integration_test.go` | `VERIFIED` |
 | **FR-11**: Unified Diff Generation & Rendering | PHASE_4 | TASK-4.2 | `internal/diff/engine.go`, `internal/diff/renderer.go` | `tests/unit/diff_test.go` | `VERIFIED` |
-| **FR-12**: Single-Agent Execution Loop | PHASE_7 | TASK-7.1 | `internal/agent/orchestrator.go`, `internal/agent/worker.go` | `tests/integration/agent_test.go` | `NOT_STARTED` |
+| **FR-12**: Single-Agent Execution Loop | PHASE_7 | TASK-7.1 | `internal/agent/orchestrator.go`, `internal/agent/worker.go` | `tests/integration/agent_test.go` | `VERIFIED` |
 | **FR-13**: Hierarchical Multi-Agent Task Orchestration | PHASE_10 | TASK-10.1 | `internal/agent/planner.go`, `internal/agent/orchestrator.go` | `tests/integration/multi_agent_test.go` | `NOT_STARTED` |
 | **FR-14**: OpenAI Provider Integration | PHASE_11 | TASK-11.1 | `internal/model/openai/client.go` | `tests/integration/openai_test.go` | `NOT_STARTED` |
 | **FR-15**: Anthropic Provider Integration | PHASE_11 | TASK-11.2 | `internal/model/anthropic/client.go` | `tests/integration/anthropic_test.go` | `NOT_STARTED` |
 | **FR-16**: Gemini Provider Integration | PHASE_11 | TASK-11.3 | `internal/model/gemini/client.go` | `tests/integration/gemini_test.go` | `NOT_STARTED` |
+| **FR-17**: Real Research Source Tools Ingestion | PHASE_7 | TASK-7.2 | `internal/tools/research/` | `tests/unit/research_tools_test.go` | `VERIFIED` |
+| **FR-18**: Research Provenance Tracking & DAG Decomposition | PHASE_8 | TASK-8.1 | `internal/workflows/research/provenance/`, `internal/workflows/research/agents/planner.go` | `tests/unit/research_tools_test.go` | `VERIFIED` |
 
 ---
 
