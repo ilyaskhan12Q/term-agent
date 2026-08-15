@@ -206,7 +206,7 @@ func TestWorkspaceToolsExecution(t *testing.T) {
 		t.Fatalf("failed to parse ReadFileTool JSON: %v", err)
 	}
 
-	if readPayload.Content != "{\"port\": 8080}" {
+	if readPayload.Content != "{\"port\": 8080}\n" {
 		t.Errorf("unexpected content: %q", readPayload.Content)
 	}
 

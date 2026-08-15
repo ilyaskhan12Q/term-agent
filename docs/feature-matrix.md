@@ -19,15 +19,15 @@ This document maintains full traceability between requirements specified in `PRD
 |---|---|---|---|---|---|
 | **FR-01**: Local-First Architecture | PHASE_0 | TASK-0.1 | `internal/config/config.go`, `internal/persistence/database.go` | `tests/unit/config_test.go`, `tests/integration/foundation_test.go` | `VERIFIED` |
 | **FR-02**: Multi-Provider Interface Abstraction | PHASE_0 | TASK-0.2 | `internal/model/provider.go`, `internal/model/registry.go` | `tests/unit/model_test.go` | `FOUNDATION_ONLY` |
-| **FR-03**: Human-in-the-Loop Diff Approval Gate | PHASE_0 | TASK-0.3 | `internal/security/policy.go`, `internal/mutation/transaction.go` | `tests/unit/mutation_test.go` | `FOUNDATION_ONLY` |
-| **FR-04**: Transactional Mutation Engine (11-State Machine) | PHASE_0 | TASK-0.4 | `internal/mutation/transaction.go`, `internal/mutation/mutation.go` | `tests/unit/mutation_test.go` | `FOUNDATION_ONLY` |
+| **FR-03**: Human-in-the-Loop Diff Approval Gate | PHASE_0 | TASK-0.3 | `internal/security/policy.go`, `internal/mutation/engine_impl.go` | `tests/unit/mutation_test.go` | `VERIFIED` |
+| **FR-04**: Transactional Mutation Engine (11-State Machine) | PHASE_0 | TASK-0.4 | `internal/mutation/engine_impl.go`, `internal/mutation/transaction.go` | `tests/unit/mutation_test.go`, `tests/integration/mutation_integration_test.go` | `VERIFIED` |
 | **FR-05**: Bounded Concurrent Scheduler (Default 5 Workers) | PHASE_0 | TASK-0.5 | `internal/scheduler/scheduler.go`, `internal/scheduler/dependency.go` | `tests/unit/scheduler_test.go` | `VERIFIED` |
 | **FR-06**: Context Budgeting & Compaction | PHASE_0 | TASK-0.6 | `internal/context/manager.go`, `internal/context/tokenizer.go` | `tests/unit/context_test.go` | `FOUNDATION_ONLY` |
 | **FR-07**: Session Persistence & Recovery | PHASE_1 | TASK-1.1 | `internal/app/lifecycle.go`, `internal/persistence/repository/` | `tests/integration/session_test.go` | `VERIFIED` |
-| **FR-08**: Workspace Discovery & Metadata Extraction | PHASE_3 | TASK-3.1 | `internal/workspace/discovery.go` | `tests/unit/workspace_test.go` | `NOT_STARTED` |
-| **FR-09**: Read-Only Workspace Search & Inspections | PHASE_3 | TASK-3.2 | `internal/tools/search.go`, `internal/tools/read.go` | `tests/unit/tools_test.go` | `NOT_STARTED` |
-| **FR-10**: Optimistic Concurrency Control (`before_hash`) | PHASE_4 | TASK-4.1 | `internal/mutation/mutation.go`, `internal/workspace/hashing.go` | `tests/unit/hashing_test.go` | `FOUNDATION_ONLY` |
-| **FR-11**: Unified Diff Generation & Rendering | PHASE_4 | TASK-4.2 | `internal/diff/engine.go`, `internal/diff/renderer.go` | `tests/unit/diff_test.go` | `NOT_STARTED` |
+| **FR-08**: Workspace Discovery & Metadata Extraction | PHASE_3 | TASK-3.1 | `internal/workspace/discovery.go` | `tests/unit/workspace_test.go` | `VERIFIED` |
+| **FR-09**: Read-Only Workspace Search & Inspections | PHASE_3 | TASK-3.2 | `internal/tools/search.go`, `internal/tools/read.go`, `internal/tools/list.go` | `tests/unit/workspace_test.go` | `VERIFIED` |
+| **FR-10**: Optimistic Concurrency Control (`before_hash`) | PHASE_4 | TASK-4.1 | `internal/mutation/engine_impl.go`, `internal/workspace/hashing.go` | `tests/unit/mutation_test.go`, `tests/integration/mutation_integration_test.go` | `VERIFIED` |
+| **FR-11**: Unified Diff Generation & Rendering | PHASE_4 | TASK-4.2 | `internal/diff/engine.go`, `internal/diff/renderer.go` | `tests/unit/diff_test.go` | `VERIFIED` |
 | **FR-12**: Single-Agent Execution Loop | PHASE_7 | TASK-7.1 | `internal/agent/orchestrator.go`, `internal/agent/worker.go` | `tests/integration/agent_test.go` | `NOT_STARTED` |
 | **FR-13**: Hierarchical Multi-Agent Task Orchestration | PHASE_10 | TASK-10.1 | `internal/agent/planner.go`, `internal/agent/orchestrator.go` | `tests/integration/multi_agent_test.go` | `NOT_STARTED` |
 | **FR-14**: OpenAI Provider Integration | PHASE_11 | TASK-11.1 | `internal/model/openai/client.go` | `tests/integration/openai_test.go` | `NOT_STARTED` |
@@ -41,8 +41,8 @@ This document maintains full traceability between requirements specified in `PRD
 | Requirement | Phase | Task | Implementation | Tests | Status |
 |---|---|---|---|---|---|
 | **NFR-01**: Cold Startup Latency (< 150ms) | PHASE_1 | TASK-1.2 | `cmd/termagent/main.go`, `internal/app/app.go` | `tests/integration/startup_test.go` | `VERIFIED` |
-| **NFR-02**: Zero Uncontrolled Workspace Mutations | PHASE_4 | TASK-4.3 | `internal/mutation/mutation.go`, `internal/workspace/locking.go` | `tests/security/boundary_test.go` | `FOUNDATION_ONLY` |
-| **NFR-03**: Memory Bounded File Streaming | PHASE_3 | TASK-3.3 | `internal/tools/read.go`, `internal/workspace/workspace.go` | `tests/unit/read_test.go` | `NOT_STARTED` |
+| **NFR-02**: Zero Uncontrolled Workspace Mutations | PHASE_4 | TASK-4.3 | `internal/mutation/engine_impl.go`, `internal/tools/write.go`, `internal/tools/edit.go` | `tests/unit/mutation_test.go`, `tests/integration/mutation_integration_test.go` | `VERIFIED` |
+| **NFR-03**: Memory Bounded File Streaming | PHASE_3 | TASK-3.3 | `internal/tools/read.go`, `internal/workspace/reader.go` | `tests/unit/workspace_test.go` | `VERIFIED` |
 | **NFR-04**: Decoupled Event-Driven UI Architecture | PHASE_0 | TASK-0.7 | `internal/events/bus.go`, `internal/events/memory_bus.go` | `tests/unit/eventbus_test.go` | `VERIFIED` |
 | **NFR-05**: Thread-Safe Event Bus with Panic Recovery | PHASE_0 | TASK-0.8 | `internal/events/memory_bus.go` | `tests/unit/eventbus_test.go` | `VERIFIED` |
 
@@ -54,9 +54,9 @@ This document maintains full traceability between requirements specified in `PRD
 |---|---|---|---|---|---|
 | **SEC-01**: Lexical Path Traversal Prevention | PHASE_0 | TASK-0.9 | `internal/security/path.go` | `tests/security/boundary_test.go` | `VERIFIED` |
 | **SEC-02**: Runtime Symlink Escape Resolution | PHASE_3 | TASK-3.4 | `internal/security/path.go` (`filepath.EvalSymlinks`) | `tests/security/boundary_test.go` | `FOUNDATION_ONLY` |
-| **SEC-03**: Non-Naive Shell Risk Classifier (POSIX AST) | PHASE_6 | TASK-6.1 | `internal/security/classifier.go` | `tests/security/boundary_test.go` | `FOUNDATION_ONLY` |
-| **SEC-04**: Sensitive Path Check (`.env`, `~/.ssh/`) | PHASE_6 | TASK-6.2 | `internal/security/policy.go`, `internal/security/permissions.go` | `tests/security/policy_test.go` | `NOT_STARTED` |
-| **SEC-05**: Command Timeout & Execution Limits | PHASE_5 | TASK-5.1 | `internal/tools/shell.go` | `tests/unit/shell_test.go` | `NOT_STARTED` |
+| **SEC-03**: Non-Naive Shell Risk Classifier (POSIX AST) | PHASE_5 | TASK-5.1 | `internal/security/classifier.go` | `tests/unit/classifier_test.go`, `tests/security/boundary_test.go` | `VERIFIED` |
+| **SEC-04**: Sensitive Path Check (`.env`, `~/.ssh/`) | PHASE_5 | TASK-5.1 | `internal/security/policy.go`, `internal/security/permissions.go` | `tests/security/policy_test.go` | `VERIFIED` |
+| **SEC-05**: Command Timeout & Execution Limits | PHASE_5 | TASK-5.1 | `internal/tools/shell.go` | `tests/unit/shell_test.go` | `VERIFIED` |
 | **SEC-06**: Secret Redaction in Logs & SQLite Messages | PHASE_1 | TASK-1.3 | `internal/config/logging.go`, `internal/persistence/writer.go` | `tests/unit/logger_test.go` | `VERIFIED` |
 | **SEC-07**: Prompt Injection Defense (Data Isolation) | PHASE_7 | TASK-7.2 | `internal/agent/context.go` | `tests/security/injection_test.go` | `NOT_STARTED` |
 
