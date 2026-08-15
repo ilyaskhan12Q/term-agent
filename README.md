@@ -73,27 +73,6 @@ go test -race -v ./...
 go build ./...
 ```
 
----
-
-## Implementation Phase Status
-
-| Phase | Component Description | Status |
-|---|---|---|
-| **Phase 0** | Project Skeleton & Architecture Foundation | `VERIFIED` |
-| **Phase 1** | Application Lifecycle & CLI Setup | `VERIFIED` |
-| **Phase 2** | Bubble Tea Terminal UI | `VERIFIED` |
-| **Phase 3** | Workspace Discovery & Engine | `VERIFIED` |
-| **Phase 4** | Mutation Engine & Optimistic OCC | `VERIFIED` |
-| **Phase 5** | Tool Runtime & Shell Sandbox | `VERIFIED` |
-| **Phase 6** | Security Policy Engine & AST Classifier | `VERIFIED` |
-| **Phase 7** | Real Research & Source Tools (arXiv, Web, PDF, Citation Verifier) | `VERIFIED` |
-| **Phase 8** | Provenance Tracking & Task Decomposition (Planner DAG, Deduplication) | `VERIFIED` |
-| **Phase 9** | Parallel Specialist Researchers | `IN_PROGRESS` |
-| **Phase 10** | Evidence & Citation Verification | `NOT_STARTED` |
-| **Phase 11** | Research Synthesis | `NOT_STARTED` |
-| **Phase 12** | Global Paper Templates & Writer | `NOT_STARTED` |
-| **Phase 13** | Reviewer & Hallucination/Claim Detection | `NOT_STARTED` |
-| **Phase 14** | Full End-to-End Research Mode | `NOT_STARTED` |
 
 ---
 

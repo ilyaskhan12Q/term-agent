@@ -2,6 +2,7 @@
 bin/
 /termagent
 /termagent-demo
+/term-agent
 *.exe
 *.dll
 *.so
@@ -29,6 +30,7 @@ Thumbs.db
 .idea/
 *.swp
 *~
+.kombai/
 
 # Testing, Coverage & Logs
 /tmp/
@@ -38,6 +40,15 @@ coverage.out
 *.pprof
 *.out
 *.log
+*.tmp
+*.bak
+
+# Internal Documentation & Phase Tracking
+docs/
+/docs/
+.phase-status.md
+.phase_tracker.*
+prd_review.txt
 
 # Local Agent & Scratch
 .gemini/
